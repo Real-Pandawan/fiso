@@ -10,6 +10,8 @@ $Build = Join-Path $Root 'build-windows'
 $App   = Join-Path $Root 'fiso-explorer'
 
 function Step($msg) { Write-Host "`n==> $msg" }
+# npm and npx are called as npm.cmd / npx.cmd: their PowerShell wrappers (npm.ps1) re-read the
+# original command line and lose the arguments when called through this function.
 function Run($exe) {
   & $exe @args
   if ($LASTEXITCODE -ne 0) { throw "$exe failed with exit code $LASTEXITCODE" }
@@ -36,10 +38,10 @@ Copy-Item $Bin (Join-Path $App 'bin\fiso.exe') -Force
 
 Push-Location $App
 try {
-  Run npm ci --no-audit --no-fund
+  Run npm.cmd ci --no-audit --no-fund
   if (Test-Path dist) { Remove-Item -Recurse -Force dist }
   $env:CSC_IDENTITY_AUTO_DISCOVERY = 'false'
-  Run npx electron-builder --win nsis --x64 --publish never
+  Run npx.cmd electron-builder --win nsis --x64 --publish never
   $Setup = Get-ChildItem dist -Filter '*.exe' | Select-Object -First 1
   if (-not $Setup) { throw 'no installer produced' }
   Write-Host $Setup.FullName
