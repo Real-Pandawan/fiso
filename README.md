@@ -4,7 +4,7 @@
 
 **FISO Explorer** is the desktop application to create, open, play, verify and convert FISO images.
 
-<p align="center"><a href="../../releases/latest"><b>Download FISO Explorer</b></a> · <a href="spec/FISO_FORMAT_v1.0.md">Read the specification</a> · <a href="docs/PRESENTATION_FR.md">Présentation en français</a></p>
+<p align="center"><a href="../../releases/latest"><b>Download FISO Explorer</b></a> · <a href="spec/FISO_FORMAT_v1.0.md">Read the specification</a> · <a href="#players-with-fiso-support">Players with FISO support</a> · <a href="docs/PRESENTATION_FR.md">Présentation en français</a></p>
 
 ## Why FISO?
 
@@ -59,6 +59,16 @@ On Ubuntu 22.04 and later, AppImages need FUSE 2: `sudo apt install libfuse2` (U
 On Linux, reading a CD requires your user to be a member of the group that owns the drive, usually `cdrom` (Debian, Ubuntu) or `optical` (Arch, Fedora): run `sudo usermod -aG cdrom $USER`, then log out and back in. On Windows, no administrator rights are needed.
 
 FISO images are archives: they keep the audio exactly as created, including high-resolution audio. To burn a CD, use **Convert to a burnable audio CD image**, then open the `.cue` file with your usual burning software and burn in Disc-at-Once (DAO) mode.
+
+## Players with FISO support
+
+[**Blaze Player for Browser**](https://chromewebstore.google.com/detail/blaze-player-for-browser/lcceeboanbnanhcpmfjgidceiiaknlmk) is the first media player with native FISO support. It opens `.fiso` images directly in the browser and shows them as albums, with the cover, the track list and the audio format of each track.
+
+<p align="center"><a href="https://chromewebstore.google.com/detail/blaze-player-for-browser/lcceeboanbnanhcpmfjgidceiiaknlmk"><img src="docs/images/blaze-player-for-browser.webp" alt="Blaze Player for Browser playing a FISO image: album view with cover, track list and format details (FISO, FLAC, 24 bit / 48 kHz)" width="900"></a></p>
+
+<p align="center"><a href="https://chromewebstore.google.com/detail/blaze-player-for-browser/lcceeboanbnanhcpmfjgidceiiaknlmk">Get Blaze Player for Browser on the Chrome Web Store</a></p>
+
+Developers who want to add FISO support to another player can start from the [specification](spec/FISO_FORMAT_v1.0.md) and [docs/DEVELOPERS.md](docs/DEVELOPERS.md).
 
 ## Command-line tool
 
