@@ -1,0 +1,66 @@
+# Builds the four installers and attaches them to a GitHub release.
+# Runs when a release is published; can also be started by hand from the Actions tab
+# (the installers are then available as workflow artifacts only).
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS Intel
+            os: macos-15-intel
+            command: ./packaging/macos/build-mac.sh x64
+            files: fiso-explorer/dist/*.dmg
+          - name: macOS Apple Silicon
+            os: macos-15
+            command: ./packaging/macos/build-mac.sh arm64
+            files: fiso-explorer/dist/*.dmg
+          - name: Windows x64
+            os: windows-2022
+            command: powershell -ExecutionPolicy Bypass -File packaging\windows\build-windows.ps1
+            files: fiso-explorer/dist/*.exe
+          - name: Linux x64
+            os: ubuntu-22.04
+            command: ./packaging/linux/build-linux.sh
+            files: fiso-explorer/dist/*.AppImage
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build
+        run: ${{ matrix.command }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+
+  publish:
+    name: Attach installers to the release
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: installers
+          merge-multiple: true
+      - name: Upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -l installers
+          gh release upload "${{ github.event.release.tag_name }}" installers/* --clobber --repo "${{ github.repository }}"

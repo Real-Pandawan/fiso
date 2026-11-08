@@ -1,0 +1,45 @@
+# Builds the engine and runs the test suite on every push and pull request.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  engine:
+    name: Engine tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-15, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Test
+        working-directory: build
+        run: ctest -C Release --output-on-failure
+
+  app:
+    name: Application checks
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: fiso-explorer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: fiso-explorer/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Lint and translations
+        run: npm run lint

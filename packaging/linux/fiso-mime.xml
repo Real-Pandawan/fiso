@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-fiso-image">
+    <comment>FISO audio disc image</comment>
+    <comment xml:lang="fr">Image de disque audio FISO</comment>
+    <magic priority="80"><match type="string" offset="0" value="\x89FISO\r\n\n"/></magic>
+    <glob pattern="*.fiso"/>
+  </mime-type>
+</mime-info>

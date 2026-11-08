@@ -1,0 +1,13 @@
+# C++ code style (clang-format 15 or later): clang-format -i <files>
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 130
+AccessModifierOffset: -2
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true
+AllowShortLambdasOnASingleLine: All
+DerivePointerAlignment: false
+PointerAlignment: Right
+SortIncludes: Never
+IncludeBlocks: Preserve

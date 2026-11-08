@@ -1,0 +1,14 @@
+# Build folders (CMake and installer scripts)
+build/
+build-*/
+
+# Application build output
+fiso-explorer/node_modules/
+fiso-explorer/dist/
+fiso-explorer/bin/
+fiso-explorer/native-build/
+
+# System files
+.DS_Store
+Thumbs.db
+*.log

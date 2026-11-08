@@ -1,0 +1,5 @@
+# Quick Look thumbnail extension (macOS only)
+add_executable(fiso-thumbnail thumbnail.cpp)
+set_target_properties(fiso-thumbnail PROPERTIES OUTPUT_NAME FISOThumbnail)
+target_include_directories(fiso-thumbnail PRIVATE ${CMAKE_SOURCE_DIR}/libfiso/src)
+target_link_libraries(fiso-thumbnail PRIVATE fiso fiso_flac)

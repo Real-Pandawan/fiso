@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src fiso-audio:; connect-src 'none'; object-src 'none'; base-uri 'none'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FISO Explorer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="side">
+        <div class="drag side-top"></div>
+        <div class="brand">
+          <img class="brand-icon" src="brand-icon.png" alt="" width="30" height="30" />
+          <div><b>FISO</b> Explorer</div>
+        </div>
+        <nav id="nav"></nav>
+        <div class="side-section" id="side-recent"></div>
+        <div class="side-section" id="side-album"></div>
+        <div class="side-bottom" id="side-bottom"></div>
+      </aside>
+      <main class="main">
+        <div class="drag main-top"></div>
+        <div id="view" class="view"></div>
+      </main>
+      <footer class="player" id="player" hidden></footer>
+    </div>
+    <div id="modal-root"></div>
+    <div id="toast-root"></div>
+    <div class="dropzone" id="dropzone" hidden><div></div></div>
+    <audio id="audio" preload="none"></audio>
+    <script src="i18n/en.js"></script>
+    <script src="i18n/fr.js"></script>
+    <script src="i18n/es.js"></script>
+    <script src="i18n/de.js"></script>
+    <script src="i18n/pt.js"></script>
+    <script src="i18n/it.js"></script>
+    <script src="i18n/nl.js"></script>
+    <script src="i18n/ja.js"></script>
+    <script src="icons.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

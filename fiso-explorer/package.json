@@ -1,0 +1,178 @@
+{
+  "name": "fiso-explorer",
+  "productName": "FISO Explorer",
+  "version": "1.0.0",
+  "description": "Reference application for the FISO (Flac ISO) open audio disc image format",
+  "main": "src/main.js",
+  "author": "Anthony Gentil — Retro-Spare <https://dev.retro-spare.fr>",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Real-Pandawan/fiso",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Real-Pandawan/fiso.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Real-Pandawan/fiso/issues"
+  },
+  "scripts": {
+    "start": "electron .",
+    "lint": "eslint src scripts && prettier --check src scripts && node scripts/check-i18n.js",
+    "format": "prettier --write src scripts",
+    "check:i18n": "node scripts/check-i18n.js",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --x64 --publish never",
+    "dist:linux": "electron-builder --linux --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^45.2.0",
+    "electron-builder": "^26.0.0",
+    "eslint": "^9.14.0",
+    "globals": "^15.12.0",
+    "prettier": "^3.3.3"
+  },
+  "build": {
+    "appId": "fr.retrospare.fiso-explorer",
+    "productName": "FISO Explorer",
+    "copyright": "© 2026 Anthony Gentil — Retro-Spare. Apache-2.0",
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "bin",
+        "to": "bin",
+        "filter": [
+          "fiso",
+          "fiso.exe"
+        ]
+      },
+      {
+        "from": "../spec",
+        "to": "spec",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../LICENSE",
+        "to": "LICENSE"
+      }
+    ],
+    "fileAssociations": [
+      {
+        "ext": "fiso",
+        "name": "FISO Disc Image",
+        "description": "FISO lossless audio disc image",
+        "role": "Editor",
+        "rank": "Owner",
+        "icon": "resources/fiso-document",
+        "isPackage": false,
+        "mimeType": "application/x-fiso-image"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.music",
+      "target": [
+        "dmg"
+      ],
+      "icon": "resources/icon.icns",
+      "identity": null,
+      "hardenedRuntime": false,
+      "minimumSystemVersion": "12.0",
+      "extendInfo": {
+        "NSHumanReadableCopyright": "© 2026 Anthony Gentil — Retro-Spare",
+        "UTExportedTypeDeclarations": [
+          {
+            "UTTypeIdentifier": "fr.retrospare.fiso-image",
+            "UTTypeDescription": "FISO Disc Image",
+            "UTTypeConformsTo": [
+              "public.data",
+              "public.audio"
+            ],
+            "UTTypeTagSpecification": {
+              "public.filename-extension": [
+                "fiso"
+              ],
+              "public.mime-type": [
+                "application/x-fiso-image"
+              ]
+            }
+          }
+        ]
+      },
+      "extraFiles": [
+        {
+          "from": "native-build/FISOThumbnail.appex",
+          "to": "PlugIns/FISOThumbnail.appex"
+        }
+      ]
+    },
+    "dmg": {
+      "title": "FISO Explorer ${version}",
+      "background": "resources/dmg-background.png",
+      "iconSize": 112,
+      "window": {
+        "width": 600,
+        "height": 400
+      },
+      "contents": [
+        {
+          "x": 160,
+          "y": 200,
+          "type": "file"
+        },
+        {
+          "x": 440,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "artifactName": "FISO-Explorer-${version}-${os}-${arch}.${ext}",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "resources/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "FISO Explorer"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Audio",
+      "icon": "resources/icon.png",
+      "synopsis": "Open lossless audio CD image format (FLAC)",
+      "executableName": "fiso-explorer",
+      "mimeTypes": [
+        "application/x-fiso-image"
+      ],
+      "syncDesktopName": true
+    },
+    "publish": null
+  },
+  "desktopName": "fiso-explorer.desktop"
+}

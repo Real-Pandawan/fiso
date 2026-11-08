@@ -1,0 +1,35 @@
+# Changelog
+
+All notable changes to this project are documented in this file. Versions follow [Semantic Versioning](https://semver.org/).
+
+## 1.0.0
+
+First public release.
+
+### Format
+
+* FISO v1.0 specification (English and French, CC0): container with signature, header CRC and chunk table; `LAYT` disc layout (tracks, indexes, pre-gaps, hidden track one audio, ISRC, MCN, flags, TOC); FLAC audio segments cut at INDEX 01; `META` metadata (`fiso.meta/1`, JSON schema); `PICT` artwork; `CDTX` raw CD-Text; `RLOG` rip log; SHA-256 per chunk.
+* Three integrity levels: valid file, intact audio, verified rip.
+* Multi-disc albums through a shared album identifier.
+
+### Library and command-line tool
+
+* `libfiso`, a C++20 library with a stable C API (`fiso.h`): create (FLAC/WAV files, CUE sheets, raw CD layout), read, random-access PCM, verify, edit metadata without touching the audio, extract, group discs, MusicBrainz disc ID.
+* FLAC files are stored without re-encoding when their frames can be kept as they are.
+* `fiso` command-line tool built on the public API, with machine-readable progress.
+* Audio CD export (`bin-cue`): a BIN/CUE that any burning software can write. Track starts that do not fall on CD sectors move to the nearest sector without adding gaps; audio that is not 44.1 kHz / 16-bit / stereo is converted only on request; the image itself is never modified.
+* CD ripping on macOS: secure and fast modes, C2 error pointers, read-offset correction, pre-gap detection through sub-channel Q, hidden track one audio, ISRC, MCN, CD-Text.
+* AccurateRip v1/v2 checksums, database lookup and drive offsets; "verified rip" is recorded only when every track matches.
+
+### FISO Explorer
+
+* Desktop application for macOS (Apple Silicon and Intel), Windows and Linux.
+* Create, open, play (gap-less), verify, edit metadata, export tracks, artwork and metadata, convert to a burnable audio CD image.
+* MusicBrainz lookup with release covers and track counts; artwork from the Cover Art Archive.
+* Front cover shown as the icon of `.fiso` files in the macOS Finder (Quick Look extension); optional freedesktop thumbnailer on Linux.
+* Interface in English, French, Spanish, German, Portuguese, Italian, Dutch and Japanese; light and dark themes.
+
+### Quality
+
+* Conformance test suite (216 checks, including a simulated CD drive) run on macOS, Windows and Linux.
+* Freely redistributable sample images in `test-files/`.

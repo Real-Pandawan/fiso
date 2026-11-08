@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key><string>en</string>
+	<key>CFBundleDisplayName</key><string>FISO Thumbnail</string>
+	<key>CFBundleExecutable</key><string>FISOThumbnail</string>
+	<key>CFBundleIdentifier</key><string>fr.retrospare.fiso-explorer.thumbnail</string>
+	<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+	<key>CFBundleName</key><string>FISOThumbnail</string>
+	<key>CFBundlePackageType</key><string>XPC!</string>
+	<key>CFBundleShortVersionString</key><string>1.0.0</string>
+	<key>CFBundleVersion</key><string>1.0.0</string>
+	<key>CFBundleSupportedPlatforms</key><array><string>MacOSX</string></array>
+	<key>LSMinimumSystemVersion</key><string>12.0</string>
+	<key>NSHumanReadableCopyright</key><string>© 2026 Anthony Gentil — Retro-Spare. Apache-2.0</string>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>QLSupportedContentTypes</key><array><string>fr.retrospare.fiso-image</string></array>
+			<key>QLThumbnailMinimumDimension</key><integer>0</integer>
+		</dict>
+		<key>NSExtensionPointIdentifier</key><string>com.apple.quicklook.thumbnail</string>
+		<key>NSExtensionPrincipalClass</key><string>FISOThumbnailProvider</string>
+	</dict>
+</dict>
+</plist>

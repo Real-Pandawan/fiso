@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=fiso
+Exec=fiso thumbnail %i %o
+MimeType=application/x-fiso-image;

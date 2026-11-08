@@ -1,0 +1,366 @@
+// FISO Explorer — English (reference language: every other file must define the same keys). SPDX-License-Identifier: Apache-2.0
+window.I18N = window.I18N || {};
+window.LIMITS = window.LIMITS || {};
+window.HELP = window.HELP || {};
+window.I18N.en = {
+  'nav.home': 'Home',
+  'nav.create': 'Create',
+  'nav.open': 'Open…',
+  'nav.settings': 'Settings',
+  'nav.help': 'Help',
+  'nav.recent': 'Open images',
+  'nav.album': 'Album',
+
+  'home.title': 'Your discs, in a single file.',
+  'home.lead':
+    'A FISO image keeps a whole audio CD — lossless FLAC audio, disc structure, artwork and metadata — in one open file.',
+  'home.create': 'Create a FISO image',
+  'home.create.d': 'From FLAC/WAV files or a BIN/CUE image.',
+  'home.open': 'Open a FISO image',
+  'home.open.d': 'Explore, listen to and verify a disc.',
+  'home.extract': 'Extract a FISO image',
+  'home.extract.d': 'FLAC or WAV tracks, artwork, metadata.',
+  'home.drop': 'Drop a .fiso file on the window to open it.',
+
+  'ex.disc': 'Disc {n} / {t}',
+  'ex.tracks': '{n} tracks',
+  'ex.track1': '1 track',
+  'ex.play': 'Play',
+  'ex.extract': 'Extract',
+  'ex.verify': 'Verify',
+  'ex.meta': 'Metadata',
+  'ex.codec': 'Audio',
+  'ex.size': 'FISO size',
+  'ex.pcm': 'Original PCM',
+  'ex.ratio': 'Ratio',
+  'ex.mbid': 'MusicBrainz disc ID',
+  'ex.integrity': 'Integrity',
+  'ex.valid': 'Valid file',
+  'ex.audio': 'Intact audio',
+  'ex.rip': 'Verified rip',
+
+  'st.yes': 'yes',
+  'st.no': 'no',
+  'st.unchecked': 'not checked',
+  'st.noref': 'no reference',
+
+  'col.title': 'Title',
+  'col.length': 'Length',
+  'col.pregap': 'Pre-gap',
+  'col.size': 'Size',
+  'col.isrc': 'ISRC',
+
+  details: 'Track details',
+  'details.none': 'Select a track to see its details.',
+  'details.indexes': 'Indexes',
+  'details.start': 'Start (sample)',
+  'details.length': 'Length (samples)',
+  'details.flags': 'Flags',
+  'details.pre': 'Pre-emphasis',
+  'details.dcp': 'Copy permitted',
+  'details.4ch': 'Four channels',
+
+  htoa: 'Hidden audio before track 1 ({d})',
+
+  untitled: 'Untitled',
+
+  track: 'Track {n}',
+
+  'album.discs': 'Discs of this album',
+  'album.missing': 'missing',
+  'album.guess': 'guessed grouping (no shared identifier)',
+
+  'cr.title': 'Create a FISO image',
+  'cr.source': 'Source',
+  'cr.meta': 'Information',
+  'cr.output': 'Output file',
+  'cr.cd': 'Audio CD',
+  'cr.cd.d': 'Secure reading from a CD drive',
+  'cr.files': 'Audio files',
+  'cr.files.d': 'FLAC or WAV, one track per file',
+  'cr.cue': 'BIN/CUE image',
+  'cr.cue.d': '.cue sheet with BIN, WAV or FLAC',
+  'cr.add': 'Add files…',
+  'cr.choosecue': 'Choose a .cue file…',
+  'cr.nosource': 'No source selected.',
+  'cr.passthrough': 'Compatible FLAC files are stored as they are, without re-encoding.',
+  'cr.compression': 'FLAC compression',
+  'cr.compression.d': 'Level 8 recommended: slower, smaller, always lossless.',
+  'cr.choose': 'Choose location…',
+  'cr.go': 'Create image',
+  'cr.nooutput': 'No file chosen.',
+
+  'meta.album': 'Album',
+  'meta.artist': 'Album artist',
+  'meta.date': 'Date',
+  'meta.genre': 'Genre',
+  'meta.label': 'Label',
+  'meta.disctotal': 'Number of discs in the album',
+  'meta.discnum': 'Disc being imaged',
+  'meta.subtitle': 'Disc subtitle',
+  'meta.join': 'Join an existing disc…',
+  'meta.joined': 'Joined to album “{a}” (shared identifier).',
+  'meta.front': 'Front cover',
+  'meta.back': 'Back cover',
+  'meta.pick': 'Choose…',
+  'meta.remove': 'Remove',
+  'meta.tracks': 'Tracks',
+  'meta.trackartist': 'Artist (if different)',
+  'meta.err.disc': 'The disc number must be between 1 and the total number of discs.',
+  'meta.save': 'Save',
+  'meta.edit.title': 'Edit metadata',
+  'meta.edit.note': 'Only metadata is rewritten: FLAC streams are copied byte-for-byte, never re-encoded.',
+
+  'mb.title': 'MusicBrainz',
+  'mb.identify': 'Identify this disc',
+  'mb.search': 'Search',
+  'mb.artist': 'Artist',
+  'mb.album': 'Album',
+  'mb.none': 'No release found. Try searching by artist and title.',
+  'mb.choose': 'Several releases match: pick the right one.',
+  'mb.disc': 'Disc of the release',
+  'mb.apply': 'Apply',
+  'mb.loading': 'Querying MusicBrainz…',
+  'mb.covers': 'Download artwork (Cover Art Archive)',
+  'mb.mismatch': 'Warning: this disc of the release has {a} tracks, the image has {b}.',
+  'mb.applied': 'Information applied. Check it before saving.',
+
+  'xt.title': 'Extract',
+  'xt.format': 'Format',
+  'xt.flac': 'FLAC tracks',
+  'xt.flac.d': 'Direct copy, no re-encoding',
+  'xt.wav': 'WAV tracks',
+  'xt.wav.d': 'Decoded PCM, identical to the original',
+  'xt.cover': 'Artwork',
+  'xt.meta': 'Metadata (JSON)',
+  'xt.scope': 'Tracks',
+  'xt.all': 'All tracks',
+  'xt.sel': 'Selection ({n})',
+  'xt.template': 'Name template',
+  'xt.tokens': 'Tokens: {track:02} {title} {artist} {album} {albumartist} {disc} {disctotal} {year}',
+  'xt.htoa': 'Include the hidden track (before track 1)',
+  'xt.overwrite': 'Replace existing files',
+  'xt.dest': 'Destination folder',
+  'xt.go': 'Extract',
+  'xt.done': '{n} file(s) written',
+
+  'reveal.folder': 'Show in folder',
+  reveal: 'Show in Finder',
+
+  'job.encode': 'FLAC encoding',
+  'job.verify': 'Verifying',
+  'job.extract': 'Extracting',
+  'job.copy': 'Rewriting',
+  'job.cancel': 'Cancel',
+  'job.cancelled': 'Cancelled. No partial file was kept.',
+  'job.wait': 'Preparing…',
+
+  'rep.title': 'Image created',
+  'rep.pcm': 'Original PCM size',
+  'rep.fiso': 'FISO image size',
+  'rep.ratio': 'Actual compression ratio',
+  'rep.pass': '{n} FLAC track(s) kept without re-encoding',
+  'rep.open': 'Open image',
+  'rep.warnings': 'Warnings',
+
+  'ver.title': 'Verification report',
+  'ver.valid.d': 'Signature, version, header, chunk table and the SHA-256 of every chunk.',
+  'ver.audio.d': 'Full decode of every FLAC stream, FLAC MD5 check and PCM SHA-256 per segment and for the whole disc.',
+  'ver.rip.d': 'Checked against an external reference (e.g. AccurateRip). Never inferred from the other two states.',
+  'ver.segments': 'Segments',
+  'ver.verified': 'Verified: {m}',
+
+  'set.title': 'Settings',
+  'set.lang': 'Language',
+  'set.theme': 'Appearance',
+  'set.system': 'System',
+  'set.light': 'Light',
+  'set.dark': 'Dark',
+  'set.outdir': 'Default output folder',
+  'set.template': 'Extracted track name template',
+  'set.cache': 'MusicBrainz cache',
+  'set.clear': 'Clear cache',
+  'set.cleared': 'Cache cleared.',
+  'set.engine': 'Engine',
+  'set.default': 'Default',
+  'set.choose': 'Choose…',
+
+  'help.title': 'Help',
+  'help.spec': 'Read the FISO v1.0 specification',
+  'help.site': 'Project website',
+  'help.limits': 'Known limitations of this version',
+
+  'about.title': 'About',
+
+  ok: 'OK',
+
+  cancel: 'Cancel',
+
+  close: 'Close',
+
+  error: 'Error',
+
+  next: 'Continue',
+
+  'err.nobin': 'The “fiso” engine was not found ({p}). The application may be incorrectly packaged.',
+  'err.notfiso': 'Only .fiso files can be opened here.',
+
+  'cv.title': 'Convert to a burnable audio CD image',
+
+  'ex.tocd': 'Convert for CD',
+
+  'cv.home.d': 'Creates a CD-audio BIN/CUE image to burn with your usual burning software. The FISO image stays untouched.',
+  'cv.d':
+    'A FISO image keeps the audio exactly as archived. To burn a CD, FISO Explorer creates a separate BIN/CUE image in CD audio format that any burning software can write:',
+  'cv.asis': 'this image is already CD audio: the audio is copied as it is, sample for sample;',
+  'cv.align':
+    'track starts are placed on CD sectors (1/75 s): moved by less than 7 ms, no sound added or removed between tracks; a little silence completes the end of the disc;',
+  'cv.conv': 'the audio, {f}, is converted to 44.1 kHz / 16-bit / stereo (high-quality resampling and dither);',
+  'cv.keep': 'titles, pre-gaps, indexes, ISRC and MCN go into the CUE sheet; the FISO image is not changed.',
+  'cv.consent': 'I accept the conversion (the high resolution is not kept in the BIN/CUE).',
+  'cv.dest': 'Destination folder',
+  'cv.go': 'Convert',
+  'cv.exists': 'A BIN/CUE of this album already exists in this folder.',
+  'cv.replace': 'Replace',
+  'cv.done': 'Audio CD image created',
+  'cv.done.d':
+    'Open the .cue file in your burning software (for example Burn, Toast, ImgBurn or cdrdao) and burn in Disc-at-Once (DAO) mode.',
+
+  'job.convert': 'Converting to CD format',
+  'job.cd_prepare': 'Preparing the CD image',
+  'job.cd_write': 'Writing the BIN/CUE',
+
+  'e.needs_conversion': 'This image is not CD audio format (44.1 kHz, 16-bit, stereo): the conversion must be accepted.',
+  'e.multichannel': 'This image has more than 2 channels: an audio CD is stereo and FISO does not downmix.',
+
+  'w.aligned': 'Track starts aligned to CD sectors (moved by less than 7 ms, no sound added or removed).',
+  'w.end_padding': 'A few milliseconds of silence complete the end of the disc.',
+  'w.converted': 'The audio was converted to CD format (44.1 kHz / 16-bit / stereo, dithered).',
+  'w.data_tracks': 'The disc also has data tracks: only the audio tracks are stored (the table of contents records the others).',
+  'w.htoa_unreadable': 'The drive cannot read the audio before track 1 (hidden track): it was not stored.',
+  'w.no_subchannel': 'The drive does not return sub-channel data: pre-gaps (INDEX 00) could not be detected.',
+  'w.read_errors': 'Some sectors could not be read reliably: the rip is NOT error-free.',
+  'e.not_cdda': 'AccurateRip can only check an image ripped from an audio CD.',
+
+  'cr.clear': 'Remove all',
+  'cr.clear.q': 'Remove the {n} files from the list?',
+
+  'cd.drive': 'Drive',
+  'cd.refresh': 'Refresh',
+  'cd.eject': 'Eject',
+  'cd.nodrive': 'No optical drive found. Connect a drive, then refresh.',
+  'cd.nodisc': 'Insert an audio CD in the drive.',
+  'cd.reading': 'Reading the table of contents…',
+  'cd.summary': '{n} audio tracks · {d}',
+  'cd.data': 'This disc also has data tracks: only the audio tracks are kept (the table of contents records the others).',
+  'cd.htoa': 'Hidden audio before track 1: {d} (kept if the drive can read it)',
+  'cd.cdtext': 'CD-Text read from the disc',
+  'cd.mode': 'Ripping mode',
+  'cd.secure': 'Secure (recommended)',
+  'cd.secure.d':
+    'Every sector is read twice, and re-read until two identical reads are obtained when they differ or C2 errors are reported.',
+  'cd.fast': 'Fast',
+  'cd.fast.d': 'A single read; only sectors reported as faulty are re-read.',
+  'cd.offset': 'Drive read offset',
+  'cd.offset.d': 'In samples. Corrects the offset specific to each drive model; needed for AccurateRip verification.',
+  'cd.offset.find': 'Look up in AccurateRip',
+  'cd.offset.found': 'Known offset for “{n}”: {o} ({s} submissions). Applied.',
+  'cd.offset.none': 'This drive is not in the AccurateRip database. Leave 0 if you do not know its offset.',
+  'cd.ar': 'Verify with AccurateRip after ripping',
+  'cd.go': 'Rip the CD',
+
+  'job.rip': 'Reading the CD',
+  'job.pregaps': 'Detecting pre-gaps',
+  'job.accuraterip': 'Computing AccurateRip',
+
+  'rip.title': 'CD ripped',
+  'rip.errors.none': 'No read errors',
+  'rip.errors': '{n} unreadable sector(s): the rip is NOT error-free',
+  'rip.retried': '{n} sector(s) re-read',
+  'rip.c2': 'C2 error pointers used',
+  'rip.noc2': 'Drive without C2 pointers',
+
+  'ar.notrip': 'AccurateRip can only verify images ripped from an audio CD.',
+  'ar.title': 'AccurateRip',
+  'ar.check': 'Verify with AccurateRip',
+  'ar.ok': 'Verified rip: every track matches (minimum confidence {c}).',
+  'ar.partial': 'Some tracks do not match the AccurateRip database.',
+  'ar.absent': 'This disc is not (yet) in the AccurateRip database: no verification is possible.',
+  'ar.match': 'match (confidence {c})',
+  'ar.nomatch': 'no match',
+  'ar.marked': 'The “Verified rip” state was recorded in the image.',
+
+  'mb.tracks': '{n} tracks',
+  'mb.discs': '{d} CDs · {t} tracks',
+  'mb.fits': 'same track count',
+
+  'set.ar': 'AccurateRip verification',
+  'set.ar.d': 'Automatically compares rips with the AccurateRip database (Internet access).',
+  'set.reader': 'Default CD drive',
+  'set.auto': 'Automatic',
+  'set.thumbs': 'Icons of .fiso files',
+  'set.thumbs.d': 'The Finder shows the front cover as the icon of FISO images (Quick Look extension included in the app).',
+
+  'eject.done': 'Disc ejected.',
+
+  detail: 'Technical detail',
+
+  'e.no_media': 'No disc in the drive.',
+  'e.not_cd': 'The disc is not a CD.',
+  'e.permission': 'macOS refused access to the drive.',
+  'e.busy': 'The disc is in use by another application (Music, Finder…).',
+  'e.platform': 'This feature is available on macOS only in version 1.0.',
+  'e.no_audio': 'This disc has no audio tracks.',
+  'e.mixed_layout': 'This disc mixes audio and data tracks in an unsupported way.',
+  'e.no_discrecording': 'The macOS optical drive service (DiscRecording) is unavailable.',
+  'e.no_device': 'The selected drive is no longer available.',
+  'e.mixed_mode': 'AccurateRip does not support discs that start with a data track.',
+
+  sep: ': ',
+
+  'u.bytes': 'B,KB,MB,GB',
+
+  'ch.stereo': 'stereo',
+  'ch.mono': 'mono',
+  'ch.n': '{n} channels',
+
+  'pl.failed': 'Playback failed:',
+
+  'cd.media.none': 'no disc',
+  'cd.media.blank': 'blank disc',
+
+  'cr.cue.data': 'This CUE has data tracks: FISO v1.0 stores audio only and will refuse this disc.',
+
+  'about.ref': 'Reference implementation of the open FISO (Flac ISO) v1.0 format.',
+  'about.data': 'MusicBrainz data (CC0) · Artwork: Cover Art Archive, rights of their respective owners.',
+
+  'set.thumbs.fix': 'Re-enable icons',
+  'set.thumbs.working': 'Registering the extension…',
+  'set.thumbs.ok': 'Extension enabled. Reopen the Finder window to see the covers.',
+  'set.thumbs.bad': 'macOS did not enable the extension.',
+  'set.thumbs.quarantine': 'macOS still flags the app as “downloaded”: see Help.',
+  'set.thumbs.dev': 'Only available in the installed app on macOS.',
+};
+window.LIMITS.en = [
+  'CD reading: macOS only in version 1.0 (Windows and Linux will follow).',
+  'Index detection: INDEX 00 (pre-gaps) and INDEX 01; INDEX 02 and above are not searched when ripping a CD (they are kept from CUE sheets).',
+  'Sub-channel data (beyond indexes, ISRC and MCN) and the data tracks of mixed-mode CDs are not archived.',
+  'The read offset is not measured automatically: it comes from the AccurateRip database or your input. Samples out of the drive’s reach are filled with silence (no over-reading of the lead-out).',
+  'Built-in player: 16-bit preview for high-resolution images (the image is never changed).',
+  'Ad hoc signature without an Apple Developer ID: macOS asks for confirmation on first launch.',
+];
+window.HELP.en = `
+<h3>Creating an image</h3>
+<p>Pick a source (FLAC/WAV files, one track per file, or a .cue sheet), fill in the information — with MusicBrainz if you like —, set the disc number and the total number of discs, then choose where to save. Audio is compressed with FLAC level 8, verified while encoding, then the whole image is read back and checked.</p>
+<h3>Multi-disc albums</h3>
+<p>One image is one physical disc. For disc 2, use “Join an existing disc” and pick the disc 1 image: the album then shares one identifier and FISO Explorer groups the discs found in the same folder.</p>
+<h3>The three integrity states</h3>
+<p><b>Valid file</b>: the structure conforms. <b>Intact audio</b>: decoded audio matches the stored fingerprints exactly. <b>Verified rip</b>: the content was compared with an external reference. These states are independent.</p>
+<h3>Pre-gaps</h3>
+<p>A track’s pre-gap (INDEX 00) is stored at the end of the previous track, as on the disc timeline. Transitions stay seamless and every track can be extracted to FLAC without re-encoding.</p>
+<h3>Ripping an audio CD</h3>
+<p>In “Create”, choose “Audio CD”. FISO Explorer reads the table of contents, CD-Text, ISRC and MCN codes, then queries MusicBrainz. Secure mode re-reads every sector until two identical reads are obtained; sectors that remain doubtful are listed in the report, never hidden. Set your drive’s read offset (button “Look up in AccurateRip”) so that AccurateRip verification is possible.</p>
+<h3>Burning a CD</h3>
+<p>A FISO image is an archive: it keeps the audio exactly as created, high resolution included. To burn a CD, use “Convert to a burnable audio CD image”: FISO Explorer writes a CD-audio BIN/CUE image (tracks placed on CD sectors, conversion only if you accept it), which you then burn with your usual burning software in Disc-at-Once (DAO) mode. Titles, pre-gaps, indexes, ISRC and MCN go into the CUE sheet; the FISO image is never modified.</p>
+<h3>Icons in the Finder</h3>
+<p>FISO Explorer installs a Quick Look extension: .fiso files show their album’s front cover. If the icons do not appear, click “Re-enable icons” in Settings, then reopen the Finder window. If the app was downloaded, macOS may block its extension while it is flagged as “downloaded”: in Terminal, run <code>xattr -dr com.apple.quarantine "/Applications/FISO Explorer.app"</code>, relaunch FISO Explorer, then re-enable the icons.</p>`;
