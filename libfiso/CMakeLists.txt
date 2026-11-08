@@ -4,7 +4,7 @@ set(FISO_SOURCES src/util.cpp src/layout.cpp src/image.cpp src/writer.cpp src/so
 if(FISO_BUILD_SHARED)
   add_library(fiso SHARED ${FISO_SOURCES})
   target_compile_definitions(fiso PUBLIC FISO_SHARED PRIVATE FISO_BUILDING)
-  set_target_properties(fiso PROPERTIES VERSION 1.0.0 SOVERSION 1 CXX_VISIBILITY_PRESET hidden)
+  set_target_properties(fiso PROPERTIES VERSION 1.1.0 SOVERSION 1 CXX_VISIBILITY_PRESET hidden)
 else()
   add_library(fiso STATIC ${FISO_SOURCES})
 endif()

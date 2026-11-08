@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented in this file. Versions follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.1.0
 
 * Creation: optional re-encoding of FLAC sources ("Re-encode FLAC files" in FISO Explorer, `--reencode` in the `fiso` tool, `"flac_passthrough": false` in the API). Every track is then encoded with the same encoder and settings, whatever the origin of the files.
 * Images record how their audio frames were produced in `provenance.encoding` (encoder, compression level, tracks copied from FLAC sources).
