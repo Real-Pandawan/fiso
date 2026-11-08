@@ -268,9 +268,9 @@ window.I18N.es = {
   detail: 'Detalle técnico',
   'e.no_media': 'No hay ningún disco en la unidad.',
   'e.not_cd': 'El disco no es un CD.',
-  'e.permission': 'macOS ha denegado el acceso a la unidad.',
+  'e.permission': 'El sistema ha denegado el acceso a la unidad.',
   'e.busy': 'Otra aplicación está usando el disco (Música, Finder…).',
-  'e.platform': 'Esta función solo está disponible en macOS en la versión 1.0.',
+  'e.platform': 'Las unidades de CD no son compatibles con este sistema operativo.',
   'e.no_audio': 'Este disco no tiene pistas de audio.',
   'e.mixed_layout': 'Este disco mezcla pistas de audio y de datos de una forma no compatible.',
   'e.no_discrecording': 'El servicio de unidades ópticas de macOS (DiscRecording) no está disponible.',
@@ -295,7 +295,8 @@ window.I18N.es = {
   'set.thumbs.dev': 'Solo disponible en la aplicación instalada en macOS.',
 };
 window.LIMITS.es = [
-  'Lectura de CD: solo en macOS en la versión 1.0 (Windows y Linux llegarán después).',
+  'Lectura de CD (macOS, Windows, Linux): probada con unidades simuladas, aún no validada con unidades reales.',
+  'Linux: su usuario debe pertenecer al grupo propietario de la unidad (normalmente «cdrom» u «optical»).',
   'Detección de índices: INDEX 00 (pre-gaps) e INDEX 01; los INDEX 02 y siguientes no se buscan al extraer un CD (se conservan desde un archivo CUE).',
   'Los datos de subcanal (más allá de los índices, ISRC y MCN) y las pistas de datos de los CD mixtos no se archivan.',
   'El desfase de lectura no se mide automáticamente: procede de la base de AccurateRip o de tu introducción manual. Las muestras fuera del alcance de la unidad se rellenan con silencio (sin sobrelectura del lead-out).',

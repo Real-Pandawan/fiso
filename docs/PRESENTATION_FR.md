@@ -41,7 +41,7 @@ Pour compiler soi-même le logiciel, voir [BUILDING.md](BUILDING.md).
 * Afficher la pochette avant comme **icône des fichiers .fiso** dans le Finder (extension Quick Look ; bouton « Réactiver les icônes » dans les paramètres).
 * Interface en anglais (par défaut), français, espagnol, allemand, portugais, italien, néerlandais et japonais ; thème clair et sombre.
 
-Fonctions par système : l'extraction de CD et les icônes du Finder sont propres à macOS dans cette version ; tout le reste fonctionne sous macOS, Windows et Linux.
+Fonctions par système : l'extraction de CD fonctionne sous macOS, Windows et Linux (sous Linux, l'utilisateur doit appartenir au groupe `cdrom` ou `optical`). Seule l'icône des fichiers dans le Finder est propre à macOS ; sous Linux, une vignette est disponible en option.
 
 ## État du projet
 

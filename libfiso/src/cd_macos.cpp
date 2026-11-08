@@ -245,7 +245,8 @@ static std::vector<DeviceEntry> listDevices(json *out) {
                               {"class_cd", same(get(media, "kDRDeviceMediaClassKey"), "kDRDeviceMediaClassCD")},
                               {"type", mt},
                               {"blank", boolean(get(media, "kDRDeviceMediaIsBlankKey"))},
-                              {"bsd_name", e.bsd}}}});
+                              {"bsd_name", e.bsd},
+                              {"readable", st == "present" && !e.bsd.empty()}}}});
         }
         v.push_back(e);
     }
@@ -413,7 +414,7 @@ json platformDrives() {
                        {"product", "CD (" + b + ")"},
                        {"name", "CD drive (" + b + ")"},
                        {"can_read", true},
-                       {"media", {{"state", "present"}, {"bsd_name", b}, {"class_cd", true}}}});
+                       {"media", {{"state", "present"}, {"bsd_name", b}, {"class_cd", true}, {"readable", true}}}});
     return {{"platform", "macos"}, {"drives", out}};
 }
 

@@ -1,6 +1,6 @@
 set(FISO_SOURCES src/util.cpp src/layout.cpp src/image.cpp src/writer.cpp src/sources.cpp
                 src/create.cpp src/ops.cpp src/capi.cpp
-                src/cd_core.cpp src/cd_macos.cpp src/cd_none.cpp)
+                src/cd_core.cpp src/cd_mmc.cpp src/cd_macos.cpp src/cd_linux.cpp src/cd_windows.cpp src/cd_none.cpp)
 if(FISO_BUILD_SHARED)
   add_library(fiso SHARED ${FISO_SOURCES})
   target_compile_definitions(fiso PUBLIC FISO_SHARED PRIVATE FISO_BUILDING)

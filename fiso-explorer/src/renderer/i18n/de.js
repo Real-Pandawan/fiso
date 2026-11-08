@@ -269,9 +269,9 @@ window.I18N.de = {
   detail: 'Technisches Detail',
   'e.no_media': 'Keine CD im Laufwerk.',
   'e.not_cd': 'Der Datenträger ist keine CD.',
-  'e.permission': 'macOS hat den Zugriff auf das Laufwerk verweigert.',
+  'e.permission': 'Das System hat den Zugriff auf das Laufwerk verweigert.',
   'e.busy': 'Die CD wird von einer anderen App verwendet (Musik, Finder…).',
-  'e.platform': 'Diese Funktion ist in Version 1.0 nur unter macOS verfügbar.',
+  'e.platform': 'CD-Laufwerke werden auf diesem Betriebssystem nicht unterstützt.',
   'e.no_audio': 'Diese CD hat keine Audiotitel.',
   'e.mixed_layout': 'Diese CD mischt Audio- und Datentracks auf nicht unterstützte Weise.',
   'e.no_discrecording': 'Der macOS-Dienst für optische Laufwerke (DiscRecording) ist nicht verfügbar.',
@@ -296,7 +296,8 @@ window.I18N.de = {
   'set.thumbs.dev': 'Nur in der installierten App unter macOS verfügbar.',
 };
 window.LIMITS.de = [
-  'CD-Lesen: in Version 1.0 nur unter macOS (Windows und Linux folgen).',
+  'CD-Lesen (macOS, Windows, Linux): mit simulierten Laufwerken getestet, mit echten Laufwerken noch nicht geprüft.',
+  'Linux: Ihr Benutzer muss der Gruppe angehören, der das Laufwerk gehört (meist „cdrom“ oder „optical“).',
   'Index-Erkennung: INDEX 00 (Pregaps) und INDEX 01; INDEX 02 und höher werden beim Auslesen einer CD nicht gesucht (aus CUE-Dateien werden sie übernommen).',
   'Subkanaldaten (über Indizes, ISRC und MCN hinaus) und die Datentracks von Mixed-Mode-CDs werden nicht archiviert.',
   'Der Leseversatz wird nicht automatisch gemessen: Er stammt aus der AccurateRip-Datenbank oder aus deiner Eingabe. Samples außerhalb der Reichweite des Laufwerks werden mit Stille gefüllt (kein Überlesen des Lead-outs).',

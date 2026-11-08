@@ -267,9 +267,9 @@ window.I18N.it = {
   detail: 'Dettaglio tecnico',
   'e.no_media': "Nessun disco nell'unità.",
   'e.not_cd': 'Il disco non è un CD.',
-  'e.permission': "macOS ha negato l'accesso all'unità.",
+  'e.permission': "Il sistema ha negato l'accesso all'unità.",
   'e.busy': "Il disco è usato da un'altra applicazione (Musica, Finder…).",
-  'e.platform': 'Questa funzione è disponibile solo su macOS nella versione 1.0.',
+  'e.platform': 'Le unità CD non sono supportate su questo sistema operativo.',
   'e.no_audio': 'Questo disco non ha tracce audio.',
   'e.mixed_layout': 'Questo disco mescola tracce audio e dati in modo non supportato.',
   'e.no_discrecording': 'Il servizio delle unità ottiche di macOS (DiscRecording) non è disponibile.',
@@ -294,7 +294,8 @@ window.I18N.it = {
   'set.thumbs.dev': "Disponibile solo nell'applicazione installata su macOS.",
 };
 window.LIMITS.it = [
-  'Lettura dei CD: solo su macOS nella versione 1.0 (Windows e Linux arriveranno in seguito).',
+  'Lettura dei CD (macOS, Windows, Linux): testata con unità simulate, non ancora verificata con unità reali.',
+  "Linux: l'utente deve appartenere al gruppo proprietario dell'unità (di solito «cdrom» o «optical»).",
   "Rilevamento degli indici: INDEX 00 (pre-gap) e INDEX 01; gli INDEX 02 e successivi non vengono cercati durante l'estrazione di un CD (vengono conservati da un file CUE).",
   'I dati dei sottocanali (oltre a indici, ISRC e MCN) e le tracce dati dei CD misti non vengono archiviati.',
   "L'offset di lettura non viene misurato automaticamente: proviene dal database di AccurateRip o dal tuo inserimento. I campioni fuori dalla portata dell'unità vengono riempiti di silenzio (nessuna sovralettura del lead-out).",

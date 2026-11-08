@@ -47,7 +47,7 @@ On Ubuntu 22.04 and later, AppImages need FUSE 2: `sudo apt install libfuse2` (U
 | Feature | macOS | Windows | Linux |
 |---|:-:|:-:|:-:|
 | Create images from FLAC/WAV files or BIN/CUE (FLAC files are stored without re-encoding when possible) | ✓ | ✓ | ✓ |
-| Rip audio CDs: secure mode, C2 error pointers, read offset, pre-gaps, hidden track, ISRC, MCN, CD-Text | ✓ | — | — |
+| Rip audio CDs: secure mode, C2 error pointers, read offset, pre-gaps, hidden track, ISRC, MCN, CD-Text | ✓ | ✓ | ✓ |
 | AccurateRip verification | ✓ | ✓ | ✓ |
 | MusicBrainz metadata and Cover Art Archive artwork | ✓ | ✓ | ✓ |
 | Gap-less playback, integrity check, metadata editing (audio is never touched) | ✓ | ✓ | ✓ |
@@ -55,6 +55,8 @@ On Ubuntu 22.04 and later, AppImages need FUSE 2: `sudo apt install libfuse2` (U
 | Convert to a burnable audio CD image (BIN/CUE for any burning software) | ✓ | ✓ | ✓ |
 | Front cover shown as the file icon | ✓ (Finder) | — | optional thumbnailer |
 | Interface languages: English, French, Spanish, German, Portuguese, Italian, Dutch, Japanese | ✓ | ✓ | ✓ |
+
+On Linux, reading a CD requires your user to be a member of the group that owns the drive, usually `cdrom` (Debian, Ubuntu) or `optical` (Arch, Fedora): run `sudo usermod -aG cdrom $USER`, then log out and back in. On Windows, no administrator rights are needed.
 
 FISO images are archives: they keep the audio exactly as created, including high-resolution audio. To burn a CD, use **Convert to a burnable audio CD image**, then open the `.cue` file with your usual burning software and burn in Disc-at-Once (DAO) mode.
 
@@ -71,7 +73,7 @@ fiso extract "Album.fiso" --format flac --out tracks/
 fiso extract "Album.fiso" --format bin-cue --out cd/            # audio CD image for burning software
 fiso meta set "Album.fiso" --title "3=New title" --genre Jazz
 fiso group *.fiso                                               # multi-disc albums
-fiso rip "Album.fiso" --offset 6                                # macOS: secure rip
+fiso rip "Album.fiso" --offset 6                                # secure rip from the CD drive
 fiso accuraterip "Album.fiso"
 ```
 

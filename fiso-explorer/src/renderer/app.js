@@ -1176,7 +1176,7 @@ function renderCreate(v) {
     <h1 class="page-title">${esc(t('cr.title'))}</h1>
     <section class="card step"><div class="step-h"><span class="step-n">1</span><h2>${esc(t('cr.source'))}</h2></div>
       <div class="tiles">
-        <button class="tile ${C.kind === 'cd' ? 'on' : ''}" id="src-cd" ${isMac() ? '' : 'disabled'}>${icon('disc')}<div><b>${esc(t('cr.cd'))}</b><span>${esc(t(isMac() ? 'cr.cd.d' : 'e.platform'))}</span></div></button>
+        <button class="tile ${C.kind === 'cd' ? 'on' : ''}" id="src-cd">${icon('disc')}<div><b>${esc(t('cr.cd'))}</b><span>${esc(t('cr.cd.d'))}</span></div></button>
         <button class="tile ${C.kind === 'files' ? 'on' : ''}" id="src-files">${icon('music')}<div><b>${esc(t('cr.files'))}</b><span>${esc(t('cr.files.d'))}</span></div></button>
         <button class="tile ${C.kind === 'cue' ? 'on' : ''}" id="src-cue">${icon('file')}<div><b>${esc(t('cr.cue'))}</b><span>${esc(t('cr.cue.d'))}</span></div></button>
       </div>
@@ -1366,7 +1366,7 @@ function renderCreate(v) {
       CD.error = e.message;
       CD.drives = [];
     }
-    const withDisc = CD.drives.filter((d) => d.media?.state === 'present' && !d.media?.blank && d.media?.bsd_name);
+    const withDisc = CD.drives.filter((d) => d.media?.readable);
     if (!CD.drives.some((d) => d.id === CD.device) || force)
       CD.device = (withDisc.find((d) => d.id === S.settings.defaultReader) || withDisc[0] || CD.drives[0] || {}).id || '';
     if (CD.device && withDisc.some((d) => d.id === CD.device)) await loadInfo();

@@ -79,7 +79,16 @@ See the comments in `fiso.h` for `fiso_edit`, `fiso_extract` and `fiso_group`. T
 
 ## CD drives
 
-`fiso_cd_drives`, `fiso_cd_info`, `fiso_cd_rip`, `fiso_cd_eject` and `fiso_accuraterip` are declared in `fiso.h`. The CD logic (secure reading, offset correction, pre-gap detection, AccurateRip) is portable C++ in `libfiso/src/cd_core.cpp`; a platform supplies a `cd::Reader`, drive listing and eject (`cd_macos.cpp` for macOS: IOCDMedia ioctls, and DiscRecording for drive listing and eject, loaded at run time). Other platforms currently return `FISO_E_UNSUPPORTED`.
+`fiso_cd_drives`, `fiso_cd_info`, `fiso_cd_rip`, `fiso_cd_eject` and `fiso_accuraterip` are declared in `fiso.h`. The CD logic (secure reading, offset correction, pre-gap detection, AccurateRip) is portable C++ in `libfiso/src/cd_core.cpp`; a platform supplies a `cd::Reader`, drive listing and eject:
+
+| File | Platform | How the drive is read |
+|---|---|---|
+| `cd_macos.cpp` | macOS | IOCDMedia ioctls; DiscRecording (loaded at run time) for drive listing and eject |
+| `cd_linux.cpp` | Linux | MMC commands (READ TOC, READ CD, READ SUB-CHANNEL) sent through SG_IO to `/dev/srN` |
+| `cd_windows.cpp` | Windows | CD-ROM class driver ioctls (`IOCTL_CDROM_RAW_READ`, `IOCTL_CDROM_READ_TOC_EX`, `IOCTL_CDROM_READ_Q_CHANNEL`); no administrator rights |
+| `cd_none.cpp` | others | returns `FISO_E_UNSUPPORTED` |
+
+`cd_mmc.cpp` implements `cd::Reader` on top of any `cd::MmcTransport` (one method that sends a command descriptor block). The tests drive it with a simulated MMC drive, so the command encoding and decoding is covered without hardware.
 
 Engine error messages start with a stable identifier in brackets, e.g. `[no_media]`, `[read_errors]`, `[needs_conversion]`, so that applications can translate them.
 

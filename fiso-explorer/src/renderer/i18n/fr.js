@@ -310,9 +310,9 @@ window.I18N.fr = {
 
   'e.no_media': 'Aucun disque dans le lecteur.',
   'e.not_cd': 'Le disque inséré n’est pas un CD.',
-  'e.permission': 'macOS a refusé l’accès au lecteur.',
+  'e.permission': 'Le système a refusé l’accès au lecteur.',
   'e.busy': 'Le disque est utilisé par une autre application (Musique, Finder…).',
-  'e.platform': 'Cette fonction n’est disponible que sur macOS dans la version 1.0.',
+  'e.platform': 'Les lecteurs CD ne sont pas pris en charge sur ce système d’exploitation.',
   'e.no_audio': 'Ce disque ne contient aucune piste audio.',
   'e.mixed_layout': 'Ce disque mélange pistes audio et données d’une façon non prise en charge.',
   'e.no_discrecording': 'Le service des lecteurs optiques de macOS (DiscRecording) est indisponible.',
@@ -345,7 +345,8 @@ window.I18N.fr = {
   'set.thumbs.dev': 'Disponible uniquement dans l’application installée sur macOS.',
 };
 window.LIMITS.fr = [
-  'Lecture de CD : macOS uniquement dans la version 1.0 (Windows et Linux viendront ensuite).',
+  'Lecture de CD (macOS, Windows, Linux) : testée avec des lecteurs simulés, pas encore validée avec de vrais lecteurs.',
+  'Linux : votre utilisateur doit appartenir au groupe propriétaire du lecteur (en général « cdrom » ou « optical »).',
   'Détection des index : INDEX 00 (pré-gaps) et INDEX 01 ; les index 02 et plus ne sont pas recherchés lors de l’extraction d’un CD (ils sont conservés depuis un fichier CUE).',
   'Les données des sous-canaux (au-delà des index, ISRC et MCN) et les pistes de données des CD mixtes ne sont pas archivées.',
   'Le décalage de lecture n’est pas mesuré automatiquement : il vient de la base AccurateRip ou de votre saisie. Les échantillons hors de portée du lecteur sont remplacés par du silence (lecture au-delà du lead-out non utilisée).',

@@ -268,9 +268,9 @@ window.I18N.nl = {
   detail: 'Technisch detail',
   'e.no_media': 'Geen schijf in het station.',
   'e.not_cd': 'De schijf is geen cd.',
-  'e.permission': 'macOS heeft de toegang tot het station geweigerd.',
+  'e.permission': 'Het systeem heeft de toegang tot het station geweigerd.',
   'e.busy': 'De schijf wordt door een andere app gebruikt (Muziek, Finder…).',
-  'e.platform': 'Deze functie is in versie 1.0 alleen beschikbaar op macOS.',
+  'e.platform': 'Cd-stations worden op dit besturingssysteem niet ondersteund.',
   'e.no_audio': 'Deze schijf heeft geen audionummers.',
   'e.mixed_layout': 'Deze schijf combineert audio- en datatracks op een niet-ondersteunde manier.',
   'e.no_discrecording': 'De macOS-dienst voor optische stations (DiscRecording) is niet beschikbaar.',
@@ -295,7 +295,8 @@ window.I18N.nl = {
   'set.thumbs.dev': 'Alleen beschikbaar in de geïnstalleerde app op macOS.',
 };
 window.LIMITS.nl = [
-  "Cd's lezen: in versie 1.0 alleen op macOS (Windows en Linux volgen).",
+  "Cd's lezen (macOS, Windows, Linux): getest met gesimuleerde stations, nog niet gecontroleerd met echte stations.",
+  'Linux: uw gebruiker moet lid zijn van de groep die eigenaar is van het station (meestal „cdrom” of „optical”).',
   'Indexdetectie: INDEX 00 (pregaps) en INDEX 01; INDEX 02 en hoger worden bij het uitlezen van een cd niet gezocht (vanuit een CUE-bestand worden ze bewaard).',
   "Subkanaalgegevens (naast indexen, ISRC en MCN) en de datatracks van mixed-mode-cd's worden niet gearchiveerd.",
   'De leesoffset wordt niet automatisch gemeten: die komt uit de AccurateRip-database of uit je invoer. Samples buiten het bereik van het station worden met stilte gevuld (geen overlezen van de lead-out).',

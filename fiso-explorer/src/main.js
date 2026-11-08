@@ -740,13 +740,8 @@ function buildMenu() {
       submenu: [
         { label: t.extract, accelerator: 'CmdOrCtrl+E', click: () => send('extract') },
         { label: t.tocd, accelerator: 'CmdOrCtrl+B', click: () => send('tocd') },
-        // CD drives are supported on macOS only in this version
-        ...(isMac
-          ? [
-              { label: t.rip, accelerator: 'CmdOrCtrl+R', click: () => send('rip') },
-              { label: t.eject, accelerator: 'CmdOrCtrl+Shift+E', click: () => send('eject') },
-            ]
-          : []),
+        { label: t.rip, accelerator: 'CmdOrCtrl+R', click: () => send('rip') },
+        { label: t.eject, accelerator: 'CmdOrCtrl+Shift+E', click: () => send('eject') },
         { type: 'separator' },
         { label: t.verify, accelerator: 'CmdOrCtrl+Shift+V', click: () => send('verify') },
         { label: t.ar, click: () => send('accuraterip') },

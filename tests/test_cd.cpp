@@ -3,7 +3,9 @@
 // HTOA and AccurateRip.
 // SPDX-License-Identifier: Apache-2.0
 #include "cd.h"
+#include "cd_mmc.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <filesystem>
@@ -77,7 +79,12 @@ class SimDrive : public cd::Reader {
 
     std::string driveName() override { return "SIMULATED DRIVE 1.0"; }
     cd::DiscToc toc() override {
-        // build a real full-TOC byte stream and parse it, to exercise the parser
+        // parse a real full-TOC byte stream, to exercise the parser
+        auto b = fullToc();
+        return cd::parseFullToc(b.data(), b.size());
+    }
+    // READ TOC format 2 (full TOC, MSF) as a drive returns it
+    std::vector<uint8_t> fullToc() {
         std::vector<uint8_t> b(4);
         auto desc = [&](uint8_t point, uint8_t ctrl, int32_t lba, int pm = -1) {
             int32_t a = lba + 150;
@@ -103,7 +110,7 @@ class SimDrive : public cd::Reader {
         b[1] = (uint8_t)len;
         b[2] = 1;
         b[3] = 1;
-        return cd::parseFullToc(b.data(), b.size());
+        return b;
     }
     bool hasC2() override { return c2; }
     int16_t sample(int64_t frame, int ch) {
@@ -170,6 +177,86 @@ class SimDrive : public cd::Reader {
     }
     std::string mcn() override { return mcnv; }
     std::vector<uint8_t> cdText() override { return text; }
+};
+
+// The same disc seen through MMC commands, as the Linux and Windows adapters see a real drive:
+// READ TOC (43h), READ CD (BEh) with C2 pointers and raw P-W sub-channel, READ SUB-CHANNEL (42h).
+class SimMmcDrive : public cd::MmcTransport {
+  public:
+    explicit SimMmcDrive(SimDrive &d) : d_(d) {}
+    int commands = 0;
+
+    long command(const uint8_t *cdb, size_t, uint8_t *data, size_t dataLen) override {
+        commands++;
+        switch (cdb[0]) {
+            case 0x43:
+                return readToc(cdb, data, dataLen);
+            case 0xBE:
+                return readCd(cdb, data, dataLen);
+            case 0x42:
+                return readSubChannel(cdb, data, dataLen);
+            default:
+                return -1;
+        }
+    }
+
+  private:
+    static long reply(const std::vector<uint8_t> &r, size_t alloc, uint8_t *data, size_t dataLen) {
+        size_t n = std::min({r.size(), alloc, dataLen});
+        std::memcpy(data, r.data(), n);
+        return (long)n;
+    }
+    long readToc(const uint8_t *cdb, uint8_t *data, size_t dataLen) {
+        size_t alloc = (size_t)(cdb[7] << 8 | cdb[8]);
+        int format = cdb[2] & 0x0F;
+        if (format == 2) return reply(d_.fullToc(), alloc, data, dataLen);
+        if (format == 5 && !d_.text.empty()) {
+            std::vector<uint8_t> r(4);
+            r.insert(r.end(), d_.text.begin(), d_.text.end());
+            r[0] = (uint8_t)((r.size() - 2) >> 8);
+            r[1] = (uint8_t)(r.size() - 2);
+            return reply(r, alloc, data, dataLen);
+        }
+        return -1;
+    }
+    long readCd(const uint8_t *cdb, uint8_t *data, size_t dataLen) {
+        int32_t lba = (int32_t)((uint32_t)cdb[2] << 24 | cdb[3] << 16 | cdb[4] << 8 | cdb[5]);
+        int n = cdb[6] << 16 | cdb[7] << 8 | cdb[8];
+        bool withC2 = cdb[9] & 0x02, withPW = cdb[10] == 0x01;
+        if (cdb[1] != 0x04 || !(cdb[9] & 0x10) || (withC2 && !d_.c2)) return -1;
+        size_t bs = cd::kSectorBytes + (withC2 ? cd::kC2Bytes : 0) + (withPW ? 96 : 0);
+        if ((size_t)n * bs > dataLen) return -1;
+        std::vector<uint8_t> audio((size_t)n * cd::kSectorBytes), c2((size_t)n * cd::kC2Bytes);
+        if (!d_.read(lba, n, audio.data(), withC2 ? c2.data() : nullptr)) return -1;
+        for (int i = 0; i < n; i++) {
+            uint8_t *o = data + (size_t)i * bs;
+            std::memcpy(o, audio.data() + (size_t)i * cd::kSectorBytes, cd::kSectorBytes);
+            o += cd::kSectorBytes;
+            if (withC2) {
+                std::memcpy(o, c2.data() + (size_t)i * cd::kC2Bytes, cd::kC2Bytes);
+                o += cd::kC2Bytes;
+            }
+            if (withPW) {
+                uint8_t q[16];
+                if (!d_.readQ(lba + i, q)) return -1;
+                for (int b = 0; b < 96; b++) o[b] = (uint8_t)(0x80 | 0x15 | ((q[b / 8] >> (7 - b % 8)) & 1) << 6);
+            }
+        }
+        return (long)((size_t)n * bs);
+    }
+    long readSubChannel(const uint8_t *cdb, uint8_t *data, size_t dataLen) {
+        std::vector<uint8_t> r(24, 0);
+        std::string v = cdb[3] == 0x02 ? d_.mcn() : cdb[3] == 0x03 ? d_.isrc(cdb[6]) : "";
+        if (cdb[3] != 0x02 && cdb[3] != 0x03) return -1;
+        r[3] = 20;
+        r[4] = cdb[3];
+        if (!v.empty()) {
+            r[8] = 0x80;
+            std::memcpy(r.data() + 9, v.data(), std::min<size_t>(v.size(), 13));
+        }
+        return reply(r, (size_t)(cdb[7] << 8 | cdb[8]), data, dataLen);
+    }
+    SimDrive &d_;
 };
 
 static std::vector<uint8_t> makeCdText(const std::vector<std::pair<int, std::vector<std::string>>> &types) {
@@ -332,6 +419,57 @@ void testCd() {
     CHECK_EQ(bad, (size_t)0);
     CHECK_EQ(tail, (size_t)667);
     CHECK_EQ(rep["rip"]["zero_filled_samples"].get<uint64_t>(), (uint64_t)667);
+
+    std::cerr << "[CD rip through MMC commands (Linux and Windows drives)]\n";
+    {
+        uint8_t q[16], pw[96], back[16];
+        d.readQ(1000, q);
+        for (int b = 0; b < 96; b++) pw[b] = (uint8_t)(0x3F | ((q[b / 8] >> (7 - b % 8)) & 1) << 6);
+        cd::qFromRawPW(pw, back);
+        CHECK(std::memcmp(q, back, 12) == 0);  // only bit 6 (Q) is taken from the raw P-W bytes
+
+        SimDrive m = makeDisc();
+        m.text = latin1Text();
+        m.offset = 667;
+        m.flaky = {{500, 3}, {1500, 1}, {2000, 5}};
+        SimMmcDrive bus(m);
+        cd::MmcReader reader("SIMULATED MMC DRIVE", bus);
+        reader.checkAudioDisc();
+        CHECK(reader.hasC2());
+        CHECK_EQ(reader.mcn(), std::string("0123456789012"));
+        CHECK_EQ(reader.isrc(2), std::string("FRXXX2600012"));
+        CHECK_EQ(reader.isrc(3), std::string(""));
+        CHECK(reader.cdText() == m.text);
+        json mi = cd::discInfo(reader);
+        CHECK(mi["musicbrainz_disc_id"] == info["musicbrainz_disc_id"]);
+        CHECK(mi["accuraterip"]["url"] == info["accuraterip"]["url"]);
+        json mo = o;
+        mo["output"] = W("rip-mmc.fiso");
+        json mr = cd::rip(reader, mo, Progress());
+        CHECK(mr["verify"]["intact_audio"]["ok"] == true);
+        CHECK(mr["rip"]["unrecovered_sectors"].empty());
+        CHECK(mr["rip"]["retried_sectors"].get<uint64_t>() >= 3);
+        auto mimg = Image::open(W("rip-mmc.fiso"));
+        const Layout &ML = mimg->layout;
+        CHECK_EQ(ML.total, L.total);
+        CHECK(ML.findIndex(2, 0) && ML.findIndex(2, 0)->pos == (uint64_t)950 * 588);
+        CHECK_EQ(ML.tracks[1].isrc, std::string("FRXXX2600012"));
+        CHECK_EQ(ML.tracks[1].flags, (uint8_t)1);
+        CHECK_EQ(ML.mcn, std::string("0123456789012"));
+        CHECK_EQ(mimg->meta["tracks"][0]["title"].get<std::string>(), std::string("Première"));
+        std::vector<int32_t> mg(ML.total * 2);
+        mimg->readPcm(0, ML.total, mg.data());
+        CHECK(mg == got);  // bit-identical to the rip through the direct reader
+
+        SimDrive nc = makeDisc();
+        nc.c2 = false;
+        SimMmcDrive bus2(nc);
+        cd::MmcReader r2("NO C2", bus2);
+        CHECK(!r2.hasC2());
+        CHECK(r2.cdText().empty());
+        json f = cd::rip(r2, {{"output", W("rip-mmc-fast.fiso")}, {"mode", "fast"}}, Progress());
+        CHECK(f["rip"]["unrecovered_sectors"].empty());
+    }
 
     std::cerr << "[CD rip: unrecoverable sector is reported, never hidden]\n";
     {

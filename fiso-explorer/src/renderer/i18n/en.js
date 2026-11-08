@@ -307,9 +307,9 @@ window.I18N.en = {
 
   'e.no_media': 'No disc in the drive.',
   'e.not_cd': 'The disc is not a CD.',
-  'e.permission': 'macOS refused access to the drive.',
+  'e.permission': 'The system refused access to the drive.',
   'e.busy': 'The disc is in use by another application (Music, Finder…).',
-  'e.platform': 'This feature is available on macOS only in version 1.0.',
+  'e.platform': 'CD drives are not supported on this operating system.',
   'e.no_audio': 'This disc has no audio tracks.',
   'e.mixed_layout': 'This disc mixes audio and data tracks in an unsupported way.',
   'e.no_discrecording': 'The macOS optical drive service (DiscRecording) is unavailable.',
@@ -342,7 +342,8 @@ window.I18N.en = {
   'set.thumbs.dev': 'Only available in the installed app on macOS.',
 };
 window.LIMITS.en = [
-  'CD reading: macOS only in version 1.0 (Windows and Linux will follow).',
+  'CD reading (macOS, Windows, Linux): tested with simulated drives, not yet validated with real drives.',
+  'Linux: your user must belong to the group that owns the drive (usually “cdrom” or “optical”).',
   'Index detection: INDEX 00 (pre-gaps) and INDEX 01; INDEX 02 and above are not searched when ripping a CD (they are kept from CUE sheets).',
   'Sub-channel data (beyond indexes, ISRC and MCN) and the data tracks of mixed-mode CDs are not archived.',
   'The read offset is not measured automatically: it comes from the AccurateRip database or your input. Samples out of the drive’s reach are filled with silence (no over-reading of the lead-out).',

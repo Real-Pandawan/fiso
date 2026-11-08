@@ -1,5 +1,6 @@
 // CD-DA reading and AccurateRip — portable core.
-// Platform adapters (cd_macos.cpp) implement cd::Reader, drive listing and eject.
+// Platform adapters (cd_macos.cpp, cd_linux.cpp, cd_windows.cpp) implement cd::Reader, drive listing
+// and eject; cd_mmc.cpp reads discs with standard MMC commands for adapters that can send them.
 // SPDX-License-Identifier: Apache-2.0
 #pragma once
 
@@ -73,7 +74,7 @@ json accurateRipCompare(const ArResult &r, const std::vector<uint8_t> &db);
 }  // namespace fiso::cd
 
 namespace fiso {
-// Platform layer (cd_macos.cpp or cd_none.cpp)
+// Platform layer (cd_macos.cpp, cd_linux.cpp, cd_windows.cpp or cd_none.cpp)
 json platformDrives();
 std::unique_ptr<cd::Reader> platformOpenReader(const std::string &device);
 void platformEject(const std::string &device);

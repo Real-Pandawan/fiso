@@ -18,7 +18,7 @@ First public release.
 * FLAC files are stored without re-encoding when their frames can be kept as they are.
 * `fiso` command-line tool built on the public API, with machine-readable progress.
 * Audio CD export (`bin-cue`): a BIN/CUE that any burning software can write. Track starts that do not fall on CD sectors move to the nearest sector without adding gaps; audio that is not 44.1 kHz / 16-bit / stereo is converted only on request; the image itself is never modified.
-* CD ripping on macOS: secure and fast modes, C2 error pointers, read-offset correction, pre-gap detection through sub-channel Q, hidden track one audio, ISRC, MCN, CD-Text.
+* CD ripping on macOS, Windows and Linux: secure and fast modes, C2 error pointers, read-offset correction, pre-gap detection through sub-channel Q, hidden track one audio, ISRC, MCN, CD-Text. Linux drives are read with MMC commands through SG_IO, Windows drives through the CD-ROM class driver (no administrator rights needed).
 * AccurateRip v1/v2 checksums, database lookup and drive offsets; "verified rip" is recorded only when every track matches.
 
 ### FISO Explorer
@@ -31,5 +31,5 @@ First public release.
 
 ### Quality
 
-* Conformance test suite (216 checks, including a simulated CD drive) run on macOS, Windows and Linux.
+* Conformance test suite (237 checks, including simulated CD drives at the reader and MMC command levels) run on macOS, Windows and Linux.
 * Freely redistributable sample images in `test-files/`.
