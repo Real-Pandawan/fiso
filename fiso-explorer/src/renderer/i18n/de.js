@@ -73,6 +73,10 @@ window.I18N.de = {
   'cr.passthrough': 'Kompatible FLAC-Dateien werden unverändert übernommen, ohne Neukodierung.',
   'cr.compression': 'FLAC-Kompression',
   'cr.compression.d': 'Stufe 8 empfohlen: langsamer, kompakter, immer verlustfrei.',
+  'cr.reencode': 'FLAC-Dateien neu kodieren',
+  'cr.reencode.d':
+    'Jeder Titel wird dekodiert und mit demselben Encoder und denselben Einstellungen neu kodiert, unabhängig von der Herkunft der Dateien. Verlustfrei: Das Audio bleibt identisch. Langsamer.',
+  'cr.reencode.on': 'Die FLAC-Dateien werden für jeden Titel mit denselben Einstellungen neu kodiert.',
   'cr.choose': 'Speicherort wählen…',
   'cr.go': 'Image erstellen',
   'cr.nooutput': 'Keine Datei gewählt.',
@@ -141,6 +145,7 @@ window.I18N.de = {
   'rep.fiso': 'Größe des FISO-Images',
   'rep.ratio': 'Tatsächliche Kompressionsrate',
   'rep.pass': '{n} FLAC-Titel ohne Neukodierung übernommen',
+  'rep.encoded': 'Alle Titel kodiert mit {e}, Stufe {n}',
   'rep.open': 'Image öffnen',
   'rep.warnings': 'Warnungen',
   'ver.title': 'Prüfbericht',

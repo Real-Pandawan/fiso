@@ -115,7 +115,7 @@ static void usage() {
          "  fiso create  OUT.fiso (--from-cue FILE.cue | --from-files A.flac B.wav ... | --plan PLAN.json)\n"
          "                    [--meta META.json] [--album T] [--artist A] [--date D] [--genre G]\n"
          "                    [--disc N] [--disc-total M] [--disc-subtitle S] [--group-id UUID]\n"
-         "                    [--front IMG] [--back IMG] [--compression 0-8] [--no-passthrough]\n"
+         "                    [--front IMG] [--back IMG] [--compression 0-8] [--reencode]\n"
          "                    [--no-verify] [--overwrite]\n"
          "  fiso meta get IMAGE\n"
          "  fiso meta set IMAGE [--json META.json] [--album T] [--artist A] [--date D] [--genre G]\n"
@@ -156,9 +156,10 @@ struct Args {
     }
 };
 
-static const char *kFlags[] = {
-    "--json",          "--quick", "--overwrite",  "--include-htoa", "--no-passthrough", "--no-verify", "--remove-pictures",
-    "--progress-json", "--fast",  "--no-pregaps", "--no-htoa",      "--mark",           "--convert",   nullptr};
+static const char *kFlags[] = {"--json",           "--quick",    "--overwrite",  "--include-htoa",
+                               "--no-passthrough", "--reencode", "--no-verify",  "--remove-pictures",
+                               "--progress-json",  "--fast",     "--no-pregaps", "--no-htoa",
+                               "--mark",           "--convert",  nullptr};
 
 static bool isFlag(const std::string &s) {
     for (int i = 0; kFlags[i]; i++)
@@ -378,7 +379,8 @@ static int cmdCreate(const Args &a) {
     if (a.has("--front")) plan["pictures"].push_back({{"type", 3}, {"path", a.get("--front")}});
     if (a.has("--back")) plan["pictures"].push_back({{"type", 4}, {"path", a.get("--back")}});
     if (a.has("--compression")) plan["compression"] = atoi(a.get("--compression").c_str());
-    if (a.has("--no-passthrough")) plan["flac_passthrough"] = false;
+    // --reencode: FLAC sources are decoded and encoded again with the same settings for every track
+    if (a.has("--reencode") || a.has("--no-passthrough")) plan["flac_passthrough"] = false;
     if (a.has("--no-verify")) plan["verify"] = false;
     if (a.has("--overwrite")) plan["overwrite"] = true;
     char *r = nullptr;
@@ -397,6 +399,9 @@ static int cmdCreate(const Args &a) {
         printf("CD-DA        : %s\n", j["cdda"].get<bool>() ? "yes" : "no");
         if (!j["flac_passthrough_tracks"].empty())
             printf("FLAC copied  : %zu track(s) stored without re-encoding\n", j["flac_passthrough_tracks"].size());
+        else
+            printf("Encoding     : every track encoded with %s, level %d\n", j["encoding"]["encoder"].get<std::string>().c_str(),
+                   j["encoding"]["compression"].get<int>());
         if (j.contains("verify"))
             printf("Verification : %s\n",
                    j["verify"]["valid_file"]["ok"].get<bool>() && j["verify"]["intact_audio"]["ok"] == true ? "OK" : "FAILED");

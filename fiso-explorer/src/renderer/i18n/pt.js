@@ -73,6 +73,10 @@ window.I18N.pt = {
   'cr.passthrough': 'Os ficheiros FLAC compatíveis são guardados tal como estão, sem recodificação.',
   'cr.compression': 'Compressão FLAC',
   'cr.compression.d': 'Nível 8 recomendado: mais lento, mais compacto, sempre sem perdas.',
+  'cr.reencode': 'Recodificar os ficheiros FLAC',
+  'cr.reencode.d':
+    'Cada faixa é descodificada e codificada de novo com o mesmo codificador e as mesmas definições, seja qual for a origem dos ficheiros. Sem perdas: o áudio fica idêntico. Mais lento.',
+  'cr.reencode.on': 'Os ficheiros FLAC serão recodificados com as mesmas definições em todas as faixas.',
   'cr.choose': 'Escolher localização…',
   'cr.go': 'Criar a imagem',
   'cr.nooutput': 'Nenhum ficheiro escolhido.',
@@ -141,6 +145,7 @@ window.I18N.pt = {
   'rep.fiso': 'Tamanho da imagem FISO',
   'rep.ratio': 'Taxa de compressão real',
   'rep.pass': '{n} faixa(s) FLAC mantida(s) sem recodificação',
+  'rep.encoded': 'Todas as faixas codificadas com {e}, nível {n}',
   'rep.open': 'Abrir a imagem',
   'rep.warnings': 'Avisos',
   'ver.title': 'Relatório de verificação',

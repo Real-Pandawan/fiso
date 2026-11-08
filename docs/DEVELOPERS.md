@@ -71,7 +71,9 @@ Creation never alters the audio: an image made from FLAC/WAV files whose lengths
 
 Changes are reported in `warnings` (`[aligned]`, `[end_padding]`, `[converted]`) and in `cd_mastering`; the FISO image is never modified. Internally the export derives a temporary CD version with `fiso_create` (`{"source":{"kind":"fiso","path":…},"cd_compatible":true}`), which applications may also use to keep a CD version as a FISO image (`provenance.cd_mastering`); `cd_compatible` with any other source kind is refused with `[cd_version_from_fiso]`.
 
-The returned report contains `pcm_bytes`, `fiso_bytes`, `ratio`, `cdda`, `flac_passthrough_tracks`, `warnings` and the full `verify` report.
+`flac_passthrough` (default `true`) stores the frames of FLAC sources as they are when possible. Set it to `false` to decode them and encode every track again with the same encoder and settings (`compression`), whatever their origin; the audio is unchanged, only the compressed data is. The image records how its frames were produced in `provenance.encoding` (`encoder`, `compression`, and `copied_tracks` for the tracks whose frames were kept from the sources).
+
+The returned report contains `pcm_bytes`, `fiso_bytes`, `ratio`, `cdda`, `flac_passthrough_tracks`, `encoding`, `warnings` and the full `verify` report.
 
 ## Editing, extraction, grouping
 

@@ -46,7 +46,7 @@ On Ubuntu 22.04 and later, AppImages need FUSE 2: `sudo apt install libfuse2` (U
 
 | Feature | macOS | Windows | Linux |
 |---|:-:|:-:|:-:|
-| Create images from FLAC/WAV files or BIN/CUE (FLAC files are stored without re-encoding when possible) | ✓ | ✓ | ✓ |
+| Create images from FLAC/WAV files or BIN/CUE (FLAC files are stored without re-encoding when possible, or re-encoded on request with the same settings for every track) | ✓ | ✓ | ✓ |
 | Rip audio CDs: secure mode, C2 error pointers, read offset, pre-gaps, hidden track, ISRC, MCN, CD-Text | ✓ | ✓ | ✓ |
 | AccurateRip verification | ✓ | ✓ | ✓ |
 | MusicBrainz metadata and Cover Art Archive artwork | ✓ | ✓ | ✓ |
@@ -67,6 +67,7 @@ The `fiso` tool does everything the application does (the application is built o
 ```sh
 fiso create "Album.fiso" --from-files *.flac --album "Album" --artist "Artist" --front cover.jpg
 fiso create "Album - Disc 1.fiso" --from-cue album.cue --disc 1 --disc-total 2
+fiso create "Album.fiso" --from-files *.flac --album "Album" --reencode   # same FLAC encoding for every track
 fiso info   "Album.fiso"
 fiso verify "Album.fiso"
 fiso extract "Album.fiso" --format flac --out tracks/

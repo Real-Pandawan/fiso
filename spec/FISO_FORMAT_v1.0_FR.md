@@ -243,6 +243,7 @@ JSON UTF-8, sans BOM, ≤ 16 Mio. Schéma formel : `spec/schemas/fiso-meta-1.sch
     "rip": { "mode": "secure | fast", "drive": "…", "read_offset": 6, "c2": true,
              "retried_sectors": 0, "unrecovered_errors": 0,
              "verified": false, "verification": "" },
+    "encoding": { "encoder": "libFLAC 1.4.3", "compression": 8, "copied_tracks": [2, 3] },
     "derived_from": "nom de l'image d'origine, si cette image a été dérivée d'une autre image FISO",
     "cd_mastering": { "alignment": "shift", "moved_boundaries": 2, "max_shift_ms": 3.9,
                       "end_padding_samples": 547, "converted_from": "96.0 kHz / 24 bit / stereo" }
@@ -253,6 +254,8 @@ JSON UTF-8, sans BOM, ≤ 16 Mio. Schéma formel : `spec/schemas/fiso-meta-1.sch
 Membres obligatoires : `schema`, `album.title`, `disc.number`, `disc.total` (1 ≤ number ≤ total ≤ 999), `tracks` (un objet par piste de `LAYT`, associé par `number`). Tout le reste est facultatif ; un membre absent signifie *inconnu*, jamais une valeur vide. Un lecteur NE DOIT PAS échouer sur un membre inconnu.
 
 Une image FISO est une archive : un écrivain DOIT conserver l'audio source sans modification lorsqu'il crée une image depuis des fichiers, un fichier CUE ou un disque. Un écrivain PEUT proposer, comme opération séparée et explicite, de dériver une *version CD* d'une image existante (un nouveau fichier ; l'original n'est jamais modifié) afin de pouvoir la graver en CD-DA (drapeau `CDDA`). Cette image porte `provenance.derived_from` et `provenance.cd_mastering`, qui indique ce qui a été modifié : débuts de pistes déplacés sur la limite de secteur la plus proche (`shift` ; aucun son ajouté ni retiré entre les pistes), silence ajouté après la dernière piste (`end_padding_samples`) et, uniquement avec l'accord de l'utilisateur, une conversion de format (`converted_from`). Sa présence indique que l'image est une version CD et non l'archive.
+
+`provenance.encoding` indique comment les trames audio ont été produites : l'encodeur et son niveau de compression, et dans `copied_tracks` les pistes dont les trames FLAC ont été copiées telles quelles depuis les fichiers sources (encodées ailleurs, avec des réglages inconnus). En l'absence de `copied_tracks`, toutes les pistes ont été encodées par l'encodeur indiqué avec les mêmes réglages. FLAC étant sans perte, ces choix changent les données compressées, jamais l'audio décodé.
 
 Correspondance avec les étiquettes usuelles : `ALBUM`=album.title, `ALBUMARTIST`=album.artist, `DISCNUMBER`=disc.number, `DISCTOTAL`=disc.total, `DISCSUBTITLE`=disc.subtitle, `ALBUM_GROUP_ID`=album.group_id, `MUSICBRAINZ_ALBUMID`=album.musicbrainz.release_id.
 

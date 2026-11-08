@@ -66,6 +66,14 @@
         "source": { "enum": ["cd", "files", "cue"] },
         "creator": { "type": "string" },
         "derived_from": { "type": "string" },
+        "encoding": {
+          "type": "object",
+          "properties": {
+            "encoder": { "type": "string" },
+            "compression": { "type": "integer", "minimum": 0, "maximum": 8 },
+            "copied_tracks": { "type": "array", "items": { "type": "integer", "minimum": 1, "maximum": 99 } }
+          }
+        },
         "cd_mastering": {
           "type": "object",
           "properties": {

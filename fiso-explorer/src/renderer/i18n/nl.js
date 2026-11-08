@@ -73,6 +73,10 @@ window.I18N.nl = {
   'cr.passthrough': 'Compatibele FLAC-bestanden worden ongewijzigd bewaard, zonder hercodering.',
   'cr.compression': 'FLAC-compressie',
   'cr.compression.d': 'Niveau 8 aanbevolen: trager, compacter, altijd verliesvrij.',
+  'cr.reencode': 'FLAC-bestanden opnieuw coderen',
+  'cr.reencode.d':
+    'Elk nummer wordt gedecodeerd en opnieuw gecodeerd met dezelfde encoder en dezelfde instellingen, ongeacht de herkomst van de bestanden. Verliesvrij: de audio blijft identiek. Trager.',
+  'cr.reencode.on': 'De FLAC-bestanden worden voor elk nummer met dezelfde instellingen opnieuw gecodeerd.',
   'cr.choose': 'Locatie kiezen…',
   'cr.go': 'Image maken',
   'cr.nooutput': 'Geen bestand gekozen.',
@@ -142,6 +146,7 @@ window.I18N.nl = {
   'rep.fiso': 'Grootte van de FISO-image',
   'rep.ratio': 'Werkelijke compressieverhouding',
   'rep.pass': '{n} FLAC-nummer(s) zonder hercodering bewaard',
+  'rep.encoded': 'Alle nummers gecodeerd met {e}, niveau {n}',
   'rep.open': 'Image openen',
   'rep.warnings': 'Waarschuwingen',
   'ver.title': 'Controlerapport',

@@ -243,6 +243,7 @@ UTF-8 JSON, no BOM, ≤ 16 MiB. Formal schema: `spec/schemas/fiso-meta-1.schema.
     "rip": { "mode": "secure | fast", "drive": "…", "read_offset": 6, "c2": true,
              "retried_sectors": 0, "unrecovered_errors": 0,
              "verified": false, "verification": "" },
+    "encoding": { "encoder": "libFLAC 1.4.3", "compression": 8, "copied_tracks": [2, 3] },
     "derived_from": "original image file name, when this image was derived from another FISO image",
     "cd_mastering": { "alignment": "shift", "moved_boundaries": 2, "max_shift_ms": 3.9,
                       "end_padding_samples": 547, "converted_from": "96.0 kHz / 24 bit / stereo" }
@@ -253,6 +254,8 @@ UTF-8 JSON, no BOM, ≤ 16 MiB. Formal schema: `spec/schemas/fiso-meta-1.schema.
 Required members: `schema`, `album.title`, `disc.number`, `disc.total` (1 ≤ number ≤ total ≤ 999), `tracks` (one object per LAYT track, matched by `number`). Everything else is optional; an absent member means *unknown*, never an empty value. Readers MUST NOT fail on unknown members.
 
 A FISO image is an archive: writers MUST store the source audio unchanged when creating an image from files, a CUE sheet or a disc. A writer MAY offer, as a separate and explicit operation, to derive a *CD version* of an existing image (a new file; the original is never modified) so that it can be burned as CD-DA (flag `CDDA`). Such an image carries `provenance.derived_from` and `provenance.cd_mastering`, which records what was changed: track starts moved to the nearest sector boundary (`shift`; no audio added or removed between tracks), silence appended after the last track (`end_padding_samples`), and, only with the user's consent, a format conversion (`converted_from`). Its presence tells readers that the image is a CD version and not the archive.
+
+`provenance.encoding` records how the audio frames were produced: the encoder and its compression level, and in `copied_tracks` the tracks whose FLAC frames were copied unchanged from the source files (encoded elsewhere, with unknown settings). When `copied_tracks` is absent, every track was encoded by the named encoder with the same settings. FLAC is lossless: these choices change the compressed data, never the decoded audio.
 
 Mapping to common tags: `ALBUM`=album.title, `ALBUMARTIST`=album.artist, `DISCNUMBER`=disc.number, `DISCTOTAL`=disc.total, `DISCSUBTITLE`=disc.subtitle, `ALBUM_GROUP_ID`=album.group_id, `MUSICBRAINZ_ALBUMID`=album.musicbrainz.release_id.
 

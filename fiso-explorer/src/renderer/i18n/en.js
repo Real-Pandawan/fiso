@@ -86,6 +86,10 @@ window.I18N.en = {
   'cr.passthrough': 'Compatible FLAC files are stored as they are, without re-encoding.',
   'cr.compression': 'FLAC compression',
   'cr.compression.d': 'Level 8 recommended: slower, smaller, always lossless.',
+  'cr.reencode': 'Re-encode FLAC files',
+  'cr.reencode.d':
+    'Every track is decoded and encoded again with the same encoder and the same settings, whatever the origin of the files. Lossless: the audio stays identical. Slower.',
+  'cr.reencode.on': 'FLAC files will be re-encoded with the same settings for every track.',
   'cr.choose': 'Choose location…',
   'cr.go': 'Create image',
   'cr.nooutput': 'No file chosen.',
@@ -160,6 +164,7 @@ window.I18N.en = {
   'rep.fiso': 'FISO image size',
   'rep.ratio': 'Actual compression ratio',
   'rep.pass': '{n} FLAC track(s) kept without re-encoding',
+  'rep.encoded': 'Every track encoded with {e}, level {n}',
   'rep.open': 'Open image',
   'rep.warnings': 'Warnings',
 

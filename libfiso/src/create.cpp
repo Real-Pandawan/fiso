@@ -1148,6 +1148,10 @@ json createImage(const json &plan, const Progress &prog) {
         }
     }
     L.timeline_sha = tsha.finish();
+    // How the audio frames were produced: every track not listed in copied_tracks was encoded here,
+    // with the same encoder and the same settings.
+    meta["provenance"]["encoding"] = {{"encoder", std::string("libFLAC ") + FLAC__VERSION_STRING}, {"compression", level}};
+    if (!passed.empty()) meta["provenance"]["encoding"]["copied_tracks"] = passed;
     auto layt = serializeLayout(L);
     parseLayout(layt.data(), layt.size());  // self-check against the specification rules
     w.addChunk("LAYT", kChunkCritical, layt);
@@ -1177,6 +1181,7 @@ json createImage(const json &plan, const Progress &prog) {
         {"cdda", L.cdda()},
         {"htoa", bool(L.flags & LF_HTOA)},
         {"flac_passthrough_tracks", passed},
+        {"encoding", meta["provenance"]["encoding"]},
         {"warnings", warnings},
     };
     if (verify) {

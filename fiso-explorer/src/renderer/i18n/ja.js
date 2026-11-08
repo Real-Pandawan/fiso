@@ -73,6 +73,10 @@ window.I18N.ja = {
   'cr.passthrough': '互換性のある FLAC ファイルは再エンコードせずそのまま保存されます。',
   'cr.compression': 'FLAC 圧縮',
   'cr.compression.d': 'レベル 8 を推奨：時間はかかりますが小さく、常にロスレスです。',
+  'cr.reencode': 'FLAC ファイルを再エンコード',
+  'cr.reencode.d':
+    'ファイルの出所にかかわらず、すべてのトラックをデコードし、同じエンコーダーと同じ設定で再エンコードします。ロスレスのため音声は同一のままです。処理は遅くなります。',
+  'cr.reencode.on': 'FLAC ファイルはすべてのトラックで同じ設定で再エンコードされます。',
   'cr.choose': '保存先を選択…',
   'cr.go': 'イメージを作成',
   'cr.nooutput': 'ファイルが選択されていません。',
@@ -142,6 +146,7 @@ window.I18N.ja = {
   'rep.fiso': 'FISO イメージのサイズ',
   'rep.ratio': '実際の圧縮率',
   'rep.pass': '{n} 個の FLAC トラックを再エンコードせずに保持',
+  'rep.encoded': 'すべてのトラックを {e}、レベル {n} でエンコード',
   'rep.open': 'イメージを開く',
   'rep.warnings': '警告',
   'ver.title': '検証レポート',

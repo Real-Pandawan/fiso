@@ -406,6 +406,35 @@ static void testFlacPassthroughAndEdit() {
         auto y = b->readChunk(b->layout.segments[k].chunk_index, 1ull << 31);
         CHECK(framesOf(x) == framesOf(y));
     }
+    std::cerr << "[FLAC re-encoding on request: same encoder and settings for every track]\n";
+    {
+        // FLAC files from another encoder setting (level 0)
+        json l0 = create({{"output", W("level0.fiso")},
+                          {"compression", 0},
+                          {"flac_passthrough", false},
+                          {"source", {{"kind", "files"}, {"files", ex["files"]}}}});
+        CHECK(l0.is_object() && l0["encoding"]["compression"] == 0);
+        json x0 = {{"format", "flac"}, {"out_dir", W("flac_l0")}};
+        CHECK_EQ(fiso_extract(W("level0.fiso").c_str(), x0.dump().c_str(), nullptr, nullptr, &res), FISO_OK);
+        json f0 = takeResult(res)["files"];
+        json kept = create({{"output", W("kept.fiso")}, {"source", {{"kind", "files"}, {"files", f0}}}});
+        json redo =
+            create({{"output", W("redo.fiso")}, {"flac_passthrough", false}, {"source", {{"kind", "files"}, {"files", f0}}}});
+        CHECK(kept.is_object() && redo.is_object());
+        if (kept.is_object() && redo.is_object()) {
+            CHECK_EQ(kept["encoding"]["copied_tracks"].size(), (size_t)3);  // level-0 frames kept as they are
+            CHECK(redo["flac_passthrough_tracks"].empty());
+            CHECK(!redo["encoding"].contains("copied_tracks"));
+            CHECK_EQ(redo["encoding"]["compression"].get<int>(), 8);
+            CHECK(redo["encoding"]["encoder"].get<std::string>().rfind("libFLAC ", 0) == 0);
+            CHECK(redo["fiso_bytes"].get<uint64_t>() < kept["fiso_bytes"].get<uint64_t>());
+            CHECK(verifiedOk(redo["verify"]));
+            CHECK(readAll(W("redo.fiso")) == readAll(W("files.fiso")));  // lossless: same audio
+            auto im = Image::open(W("redo.fiso"));
+            CHECK(im->meta["provenance"]["encoding"] == redo["encoding"]);
+        }
+    }
+
     std::vector<Hash> before;
     for (auto &s : b->layout.segments) before.push_back(b->chunks[s.chunk_index].sha);
     a.reset();

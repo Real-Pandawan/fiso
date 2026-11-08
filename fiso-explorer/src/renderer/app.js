@@ -1152,6 +1152,7 @@ function renderCreate(v) {
       cue: null,
       out: null,
       compression: 8,
+      reencode: false,
       cd: {
         drives: null,
         device: '',
@@ -1188,6 +1189,11 @@ function renderCreate(v) {
         <label class="field">${esc(t('cr.compression'))}<select class="input" id="cr-level" style="width:120px">${[8, 7, 6, 5, 4, 3, 2, 1, 0].map((n) => `<option ${C.compression === n ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
         <span class="hint grow">${esc(t('cr.compression.d'))}</span>
       </div>
+      ${
+        C.kind === 'cd'
+          ? ''
+          : `<label class="check" style="margin-top:14px;align-items:flex-start"><input type="checkbox" id="cr-reencode" style="margin-top:3px" ${C.reencode ? 'checked' : ''}><span>${esc(t('cr.reencode'))}<br><span class="hint">${esc(t('cr.reencode.d'))}</span></span></label>`
+      }
       <div class="output-row" style="margin-top:16px"><span class="path grow">${esc(C.out || t('cr.nooutput'))}</span><button class="btn" id="cr-out">${esc(t('cr.choose'))}</button></div>
       <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn primary" id="cr-go">${icon('disc')}${esc(C.kind === 'cd' ? t('cd.go') : t('cr.go'))}</button></div>
     </section></div>`;
@@ -1226,7 +1232,7 @@ function renderCreate(v) {
         .join('')}
         <div class="srcrow"><button class="btn small" id="src-add">${icon('plus')}${esc(t('cr.add'))}</button>
           ${C.files.length ? `<button class="btn small" id="src-clear">${icon('clear')}${esc(t('cr.clear'))}</button>` : ''}
-          <span class="hint grow">${esc(t('cr.passthrough'))}</span></div></div>`;
+          <span class="hint grow">${esc(t(C.reencode ? 'cr.reencode.on' : 'cr.passthrough'))}</span></div></div>`;
       $('#src-add').onclick = addFiles;
       if ($('#src-clear'))
         $('#src-clear').onclick = () =>
@@ -1473,6 +1479,11 @@ function renderCreate(v) {
       .map((x) => ({ number: x.number, title: x.title, artist: x.artist && x.artist !== p.artist ? x.artist : '' }));
   };
   $('#cr-level').onchange = (e) => (C.compression = +e.target.value);
+  if ($('#cr-reencode'))
+    $('#cr-reencode').onchange = (e) => {
+      C.reencode = e.target.checked;
+      drawList();
+    };
   $('#cr-out').onclick = async () => {
     const a = C.form.album;
     const name =
@@ -1532,6 +1543,7 @@ async function doCreate(form) {
       output: C.out,
       overwrite: true,
       compression: C.compression,
+      flac_passthrough: !C.reencode,
       meta,
       pictures,
       source: C.kind === 'files' ? { kind: 'files', files: C.files.map((f) => f.path) } : { kind: 'cue', path: C.cue.path },
@@ -1553,6 +1565,7 @@ async function doCreate(form) {
       <div class="integrity">
         <span class="badge ${allOk ? 'ok' : 'bad'}">${icon(allOk ? 'check' : 'alert')}${esc(t('ex.valid'))} · ${esc(t('ex.audio'))}</span>
         ${r.flac_passthrough_tracks?.length ? `<span class="badge">${esc(t('rep.pass', { n: r.flac_passthrough_tracks.length }))}</span>` : ''}
+        ${r.encoding && !r.encoding.copied_tracks ? `<span class="badge">${esc(t('rep.encoded', { e: r.encoding.encoder, n: r.encoding.compression }))}</span>` : ''}
       </div>
       ${
         rip
