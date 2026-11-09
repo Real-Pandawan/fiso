@@ -15,7 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-15, windows-2022]
+        # macOS tests run on Intel: GitHub's Apple Silicon runners are often unavailable for long periods
+        os: [ubuntu-22.04, macos-15-intel, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
