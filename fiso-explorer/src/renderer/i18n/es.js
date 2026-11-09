@@ -1,12 +1,10 @@
 // FISO Explorer — Spanish. SPDX-License-Identifier: Apache-2.0
 window.I18N.es = {
   'nav.home': 'Inicio',
-  'nav.create': 'Crear',
-  'nav.open': 'Abrir…',
   'nav.settings': 'Ajustes',
   'nav.help': 'Ayuda',
+  'nav.close': 'Cerrar',
   'nav.recent': 'Imágenes abiertas',
-  'nav.album': 'Álbum',
   'home.title': 'Tus discos, en un solo archivo.',
   'home.lead':
     'Una imagen FISO conserva un CD de audio completo — audio FLAC sin pérdidas, estructura del disco, carátulas y metadatos — en un único archivo abierto.',
@@ -156,6 +154,7 @@ window.I18N.es = {
   'ver.segments': 'Segmentos',
   'ver.verified': 'Verificado: {m}',
   'set.title': 'Ajustes',
+  'set.version': 'Versión',
   'set.lang': 'Idioma',
   'set.theme': 'Apariencia',
   'set.system': 'Sistema',
@@ -167,6 +166,7 @@ window.I18N.es = {
   'set.clear': 'Vaciar la caché',
   'set.cleared': 'Caché vaciada.',
   'set.engine': 'Motor',
+  'set.engine.v': 'motor {v}',
   'set.default': 'Predeterminada',
   'set.choose': 'Elegir…',
   'help.title': 'Ayuda',

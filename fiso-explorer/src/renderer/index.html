@@ -12,19 +12,17 @@
   </head>
   <body>
     <div class="app">
-      <aside class="side">
-        <div class="drag side-top"></div>
-        <div class="brand">
+      <header class="topbar">
+        <button class="brand" id="tb-home" type="button">
           <img class="brand-icon" src="brand-icon.png" alt="" width="30" height="30" />
-          <div><b>FISO</b> Explorer</div>
+          <span><b>FISO</b> Explorer</span>
+        </button>
+        <div class="topbar-actions">
+          <button class="btn ghost icon-btn" id="tb-settings" type="button"></button>
+          <button class="btn ghost icon-btn" id="tb-help" type="button"></button>
         </div>
-        <nav id="nav"></nav>
-        <div class="side-section" id="side-recent"></div>
-        <div class="side-section" id="side-album"></div>
-        <div class="side-bottom" id="side-bottom"></div>
-      </aside>
+      </header>
       <main class="main">
-        <div class="drag main-top"></div>
         <div id="view" class="view"></div>
       </main>
       <footer class="player" id="player" hidden></footer>

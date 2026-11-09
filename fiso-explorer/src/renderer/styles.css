@@ -84,10 +84,6 @@ button {
   height: 18px;
   flex: none;
 }
-.drag {
-  -webkit-app-region: drag;
-  height: 38px;
-}
 [hidden] {
   display: none !important;
 }
@@ -105,28 +101,44 @@ a {
 /* ---------- layout */
 .app {
   display: grid;
-  grid-template-columns: 228px 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
   height: 100vh;
 }
-.side {
-  grid-row: 1 / 3;
-  background: var(--side);
-  border-right: 1px solid var(--line);
+/* Full-width top bar: logo on the left (home), settings and help on the right. The bar is the
+   window's drag area; on macOS it leaves room for the window buttons. */
+.topbar {
+  -webkit-app-region: drag;
   display: flex;
-  flex-direction: column;
-  min-height: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 56px;
+  padding: 0 16px 0 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--side);
 }
-.side-top {
-  height: 44px;
+body.mac .topbar {
+  padding-left: 84px;
+}
+.topbar button {
+  -webkit-app-region: no-drag;
 }
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 18px 18px;
+  padding: 5px 10px 5px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
   font-size: 15px;
   font-family: var(--display);
+}
+.brand:hover {
+  background: var(--surface-2);
 }
 .brand-icon {
   width: 30px;
@@ -138,90 +150,13 @@ a {
   font-weight: 750;
   letter-spacing: 0.02em;
 }
-.b-disc {
-  fill: var(--text);
-}
-.b-groove {
-  fill: none;
-  stroke: var(--side);
-  stroke-width: 0.8;
-  opacity: 0.55;
-}
-.b-hub {
-  fill: var(--side);
-}
-.b-wave {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-}
-nav,
-.side-section,
-.side-bottom {
-  padding: 0 10px;
-}
-.side-section {
-  margin-top: 18px;
-  min-height: 0;
-  overflow: auto;
-}
-.side-bottom {
-  margin-top: auto;
-  padding-bottom: 14px;
-}
-.side-label {
-  font-size: 11px;
-  font-weight: 650;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-3);
-  padding: 0 8px 6px;
-}
-.nav-item {
+.topbar-actions {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 7px 8px;
-  border: 0;
-  background: none;
-  border-radius: 8px;
-  text-align: left;
-  cursor: pointer;
-  color: var(--text-2);
+  gap: 6px;
 }
-.nav-item:hover {
+.topbar-actions .on {
   background: var(--surface-2);
   color: var(--text);
-}
-.nav-item.active {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 0 0 1px var(--line);
-}
-.nav-item .i {
-  width: 17px;
-  height: 17px;
-}
-.nav-item .sub {
-  display: block;
-  font-size: 11.5px;
-  color: var(--text-3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.nav-item .lbl {
-  min-width: 0;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.nav-item.missing {
-  opacity: 0.5;
-  cursor: default;
 }
 .main {
   position: relative;
@@ -230,21 +165,51 @@ nav,
   display: flex;
   flex-direction: column;
 }
-.main-top {
-  position: absolute;
-  inset: 0 0 auto 0;
-  z-index: 2;
-}
 .view {
   flex: 1;
   overflow: auto;
-  padding: 44px 36px 36px;
+  padding: 32px 36px 36px;
   user-select: text;
 }
 .view > * {
   max-width: 1120px;
   margin-left: auto;
   margin-right: auto;
+}
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.page-head .icon-btn {
+  margin-top: -2px;
+}
+.open-docs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+.open-doc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+}
+.open-doc .lbl {
+  min-width: 0;
+}
+.open-doc .sub {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ---------- controls */
@@ -735,7 +700,7 @@ table.tracks {
 
 /* ---------- player */
 .player {
-  grid-column: 2;
+  grid-column: 1;
   display: grid;
   grid-template-columns: 260px 1fr 180px;
   gap: 18px;
@@ -1379,4 +1344,8 @@ input[type='range']::-webkit-slider-thumb {
   .facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+.topbar-actions .i {
+  width: 20px;
+  height: 20px;
 }

@@ -1,12 +1,10 @@
 // FISO Explorer — Italian. SPDX-License-Identifier: Apache-2.0
 window.I18N.it = {
   'nav.home': 'Home',
-  'nav.create': 'Crea',
-  'nav.open': 'Apri…',
   'nav.settings': 'Impostazioni',
   'nav.help': 'Aiuto',
+  'nav.close': 'Chiudi',
   'nav.recent': 'Immagini aperte',
-  'nav.album': 'Album',
   'home.title': 'I tuoi dischi, in un solo file.',
   'home.lead':
     "Un'immagine FISO conserva un CD audio completo — audio FLAC senza perdita, struttura del disco, copertine e metadati — in un unico file aperto.",
@@ -156,6 +154,7 @@ window.I18N.it = {
   'ver.segments': 'Segmenti',
   'ver.verified': 'Verificato: {m}',
   'set.title': 'Impostazioni',
+  'set.version': 'Versione',
   'set.lang': 'Lingua',
   'set.theme': 'Aspetto',
   'set.system': 'Sistema',
@@ -167,6 +166,7 @@ window.I18N.it = {
   'set.clear': 'Svuota la cache',
   'set.cleared': 'Cache svuotata.',
   'set.engine': 'Motore',
+  'set.engine.v': 'motore {v}',
   'set.default': 'Predefinita',
   'set.choose': 'Scegli…',
   'help.title': 'Aiuto',

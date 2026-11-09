@@ -30,7 +30,7 @@ Les installeurs de FISO Explorer sont publiés sur la page *Releases* du dépôt
 
 Pour compiler soi-même le logiciel, voir [BUILDING.md](BUILDING.md).
 
-## Ce que fait la version 1.1.1
+## Ce que fait la version 1.2.0
 
 * Créer une image depuis un **CD audio** (mode sécurisé ou rapide, pointeurs C2, correction du décalage de lecture, détection des pré-gaps, audio caché avant la piste 1, ISRC, MCN, CD-Text), depuis des fichiers FLAC/WAV ou depuis un fichier CUE. Les fichiers FLAC sont conservés tels quels, ou réencodés à la demande avec exactement les mêmes réglages pour toutes les pistes.
 * Identifier le disque avec MusicBrainz (vignette de la pochette et nombre de pistes pour chaque édition) et récupérer les pochettes sur Cover Art Archive.
@@ -45,4 +45,4 @@ Fonctions par système : l'extraction de CD fonctionne sous macOS, Windows et Li
 
 ## État du projet
 
-La version 1.1.1 est la version actuelle (la 1.0.0 était la première version publique). Le format, la bibliothèque et l'application sont couverts par des tests automatiques sous macOS, Windows et Linux. L'extraction de CD et les icônes du Finder ont été testées avec un lecteur simulé et restent à confirmer sur du matériel réel : les retours sont les bienvenus dans la section *Issues* du dépôt.
+La version 1.2.0 est la version actuelle (la 1.0.0 était la première version publique). Le format, la bibliothèque et l'application sont couverts par des tests automatiques sous macOS, Windows et Linux. L'extraction de CD et les icônes du Finder ont été testées avec un lecteur simulé et restent à confirmer sur du matériel réel : les retours sont les bienvenus dans la section *Issues* du dépôt.

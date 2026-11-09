@@ -4,12 +4,10 @@ window.LIMITS = window.LIMITS || {};
 window.HELP = window.HELP || {};
 window.I18N.en = {
   'nav.home': 'Home',
-  'nav.create': 'Create',
-  'nav.open': 'Open…',
   'nav.settings': 'Settings',
   'nav.help': 'Help',
+  'nav.close': 'Close',
   'nav.recent': 'Open images',
-  'nav.album': 'Album',
 
   'home.title': 'Your discs, in a single file.',
   'home.lead':
@@ -176,6 +174,7 @@ window.I18N.en = {
   'ver.verified': 'Verified: {m}',
 
   'set.title': 'Settings',
+  'set.version': 'Version',
   'set.lang': 'Language',
   'set.theme': 'Appearance',
   'set.system': 'System',
@@ -187,6 +186,7 @@ window.I18N.en = {
   'set.clear': 'Clear cache',
   'set.cleared': 'Cache cleared.',
   'set.engine': 'Engine',
+  'set.engine.v': 'engine {v}',
   'set.default': 'Default',
   'set.choose': 'Choose…',
 

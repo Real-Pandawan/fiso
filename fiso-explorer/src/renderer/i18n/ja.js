@@ -1,12 +1,10 @@
 // FISO Explorer — Japanese. SPDX-License-Identifier: Apache-2.0
 window.I18N.ja = {
   'nav.home': 'ホーム',
-  'nav.create': '作成',
-  'nav.open': '開く…',
   'nav.settings': '設定',
   'nav.help': 'ヘルプ',
+  'nav.close': '閉じる',
   'nav.recent': '開いているイメージ',
-  'nav.album': 'アルバム',
   'home.title': 'あなたのディスクを、ひとつのファイルに。',
   'home.lead':
     'FISO イメージは、オーディオ CD 1 枚をまるごと — ロスレス FLAC 音声、ディスク構造、アートワーク、メタデータ — ひとつのオープンなファイルに保存します。',
@@ -156,6 +154,7 @@ window.I18N.ja = {
   'ver.segments': 'セグメント',
   'ver.verified': '検証済み：{m}',
   'set.title': '設定',
+  'set.version': 'バージョン',
   'set.lang': '言語',
   'set.theme': '外観',
   'set.system': 'システム',
@@ -167,6 +166,7 @@ window.I18N.ja = {
   'set.clear': 'キャッシュを消去',
   'set.cleared': 'キャッシュを消去しました。',
   'set.engine': 'エンジン',
+  'set.engine.v': 'エンジン {v}',
   'set.default': '既定',
   'set.choose': '選択…',
   'help.title': 'ヘルプ',

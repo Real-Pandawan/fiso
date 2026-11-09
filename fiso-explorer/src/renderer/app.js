@@ -171,61 +171,44 @@ function go(view) {
   render();
 }
 
-function renderSide() {
-  const item = (id, ic, label, active, extra = '') =>
-    `<button class="nav-item ${active ? 'active' : ''}" data-go="${id}">${icon(ic)}<span class="lbl">${esc(label)}${extra}</span></button>`;
-  $('#nav').innerHTML =
-    item('home', 'home', t('nav.home'), S.view === 'home') +
-    item('create', 'plus', t('nav.create'), S.view === 'create') +
-    item('open', 'folder', t('nav.open'), false);
-  $('#side-recent').innerHTML = S.docs.length
-    ? `<div class="side-label">${esc(t('nav.recent'))}</div>` +
-      S.docs
-        .map((d) => {
-          const m = d.info.meta;
-          return `<button class="nav-item ${S.view === 'explorer' && S.current === d.path ? 'active' : ''}" data-doc="${esc(d.path)}">${icon('disc')}
-          <span class="lbl">${esc(m.album.title)}<span class="sub">${esc(t('ex.disc', { n: m.disc.number, t: m.disc.total }))} · ${esc(basename(d.path))}</span></span></button>`;
-        })
-        .join('')
-    : '';
-  const d = doc();
-  const g = d?.album;
-  $('#side-album').innerHTML =
-    g && (g.discs.length > 1 || g.disc_total > 1)
-      ? `<div class="side-label">${esc(t('nav.album'))}</div>` + albumDiscs(g, d.path, true)
-      : '';
-  $('#side-bottom').innerHTML =
-    item('settings', 'gear', t('nav.settings'), S.view === 'settings') + item('help', 'help', t('nav.help'), S.view === 'help');
-  $$('[data-go]').forEach((b) => (b.onclick = () => (b.dataset.go === 'open' ? openDialog() : go(b.dataset.go))));
-  $$('[data-doc]').forEach(
-    (b) =>
-      (b.onclick = () => {
-        S.current = b.dataset.doc;
-        S.sel.clear();
-        go('explorer');
-      }),
-  );
-  $$('[data-disc]').forEach((b) => (b.onclick = () => openImage(b.dataset.disc)));
+// Top bar: the logo goes back to the home screen; settings and help open on the right.
+function renderTopbar() {
+  document.body.classList.toggle('mac', isMac());
+  const home = $('#tb-home');
+  home.title = t('nav.home');
+  home.onclick = () => go('home');
+  const btn = (id, ic, label, view) => {
+    const b = $(id);
+    b.innerHTML = icon(ic);
+    b.title = label;
+    b.setAttribute('aria-label', label);
+    b.classList.toggle('on', S.view === view);
+    b.onclick = () => go(S.view === view ? 'home' : view);
+  };
+  btn('#tb-settings', 'gear', t('nav.settings'), 'settings');
+  btn('#tb-help', 'help', t('nav.help'), 'help');
 }
 
-function albumDiscs(g, current, side) {
+// Title of a page that is closed with a cross (settings, help): back to the home screen.
+function closableTitle(title) {
+  return `<div class="page-head"><h1 class="page-title">${esc(title)}</h1>
+    <button class="btn ghost icon-btn" id="page-close" title="${esc(t('nav.close'))}" aria-label="${esc(t('nav.close'))}">${icon('x')}</button></div>`;
+}
+function bindClose(v) {
+  $('#page-close', v).onclick = () => go('home');
+}
+
+function albumDiscs(g, current) {
   const byNum = new Map(g.discs.map((d) => [d.number, d]));
   const out = [];
   for (let n = 1; n <= Math.max(g.disc_total, ...g.discs.map((d) => d.number)); n++) {
     const d = byNum.get(n);
     const label = t('ex.disc', { n, t: g.disc_total });
-    if (!d)
-      out.push(
-        side
-          ? `<div class="nav-item missing">${icon('disc')}<span class="lbl">${esc(label)}<span class="sub">${esc(t('album.missing'))}</span></span></div>`
-          : `<span class="disc-pill missing">${icon('disc')}${esc(label)} · ${esc(t('album.missing'))}</span>`,
-      );
+    if (!d) out.push(`<span class="disc-pill missing">${icon('disc')}${esc(label)} · ${esc(t('album.missing'))}</span>`);
     else {
       const sub = (d.tracks === 1 ? t('ex.track1') : t('ex.tracks', { n: d.tracks })) + (d.subtitle ? ' · ' + d.subtitle : '');
       out.push(
-        side
-          ? `<button class="nav-item ${d.path === current ? 'active' : ''}" data-disc="${esc(d.path)}">${icon('disc')}<span class="lbl">${esc(label)}<span class="sub">${esc(sub)}</span></span></button>`
-          : `<button class="disc-pill ${d.path === current ? 'on' : ''}" data-disc="${esc(d.path)}">${icon('disc')}${esc(label)} <span class="hint">${esc(sub)}</span></button>`,
+        `<button class="disc-pill ${d.path === current ? 'on' : ''}" data-disc="${esc(d.path)}">${icon('disc')}${esc(label)} <span class="hint">${esc(sub)}</span></button>`,
       );
     }
   }
@@ -234,11 +217,11 @@ function albumDiscs(g, current, side) {
 
 function render() {
   document.documentElement.lang = S.settings.lang;
-  renderSide();
+  renderTopbar();
   const v = $('#view');
   if (S.view === 'explorer' && !doc()) S.view = 'home';
   ({ home: renderHome, explorer: renderExplorer, create: renderCreate, settings: renderSettings, help: renderHelp })[S.view](v);
-  renderSide();
+  renderTopbar();
 }
 
 // ------------------------------------------------------------------ home
@@ -254,6 +237,16 @@ function renderHome(v) {
       ${card('extract', 'extract', t('home.extract'), t('home.extract.d'))}
       ${card('convert', 'disc', t('cv.title'), t('cv.home.d'))}
     </div>
+    ${
+      S.docs.length
+        ? `<div class="section-title" style="margin-top:28px">${esc(t('nav.recent'))}</div><div class="open-docs">${S.docs
+            .map((d) => {
+              const m = d.info.meta;
+              return `<button class="card open-doc" data-doc="${esc(d.path)}">${icon('disc')}<span class="lbl"><b>${esc(m.album.title)}</b><span class="sub">${esc(t('ex.disc', { n: m.disc.number, t: m.disc.total }))} · ${esc(basename(d.path))}</span></span></button>`;
+            })
+            .join('')}</div>`
+        : ''
+    }
     <div class="home-foot">${icon('info')}<span>${esc(t('home.drop'))}</span></div>
     ${S.appInfo && !S.appInfo.binOk ? `<p class="error-text" style="margin-top:16px">${esc(t('err.nobin', { p: S.appInfo.bin }))}</p>` : ''}
   </div>`;
@@ -267,6 +260,14 @@ function renderHome(v) {
           const p = await openDialog();
           if (p) extractDialog();
         } else if (a === 'convert') convertCdDialog();
+      }),
+  );
+  $$('[data-doc]', v).forEach(
+    (b) =>
+      (b.onclick = () => {
+        S.current = b.dataset.doc;
+        S.sel.clear();
+        go('explorer');
       }),
   );
 }
@@ -383,7 +384,7 @@ function renderExplorer(v) {
       </div></div>
     </div>
 
-    ${d.album && (d.album.discs.length > 1 || d.album.disc_total > 1) ? `<div class="section-title">${esc(t('album.discs'))}${d.album.method === 'heuristic' ? ` · <span style="text-transform:none;letter-spacing:0">${esc(t('album.guess'))}</span>` : ''}</div><div class="discs">${albumDiscs(d.album, d.path, false)}</div>` : ''}
+    ${d.album && (d.album.discs.length > 1 || d.album.disc_total > 1) ? `<div class="section-title">${esc(t('album.discs'))}${d.album.method === 'heuristic' ? ` · <span style="text-transform:none;letter-spacing:0">${esc(t('album.guess'))}</span>` : ''}</div><div class="discs">${albumDiscs(d.album, d.path)}</div>` : ''}
 
     <div class="tracks-wrap">
       <div class="card" style="overflow:hidden"><table class="tracks"><thead><tr>
@@ -1781,7 +1782,8 @@ async function ejectDefault() {
 // ------------------------------------------------------------------ settings
 function renderSettings(v) {
   const st = S.settings;
-  v.innerHTML = `<div class="settings"><h1 class="page-title">${esc(t('set.title'))}</h1><div class="card" style="padding:4px 22px">
+  v.innerHTML = `<div class="settings">${closableTitle(t('set.title'))}<div class="card" style="padding:4px 22px">
+    <div class="set-row"><span class="k">${esc(t('set.version'))}</span><span><b>FISO Explorer ${esc(S.appInfo?.version || '')}</b>${S.appInfo?.engineVersion ? `<span class="hint"> · ${esc(t('set.engine.v', { v: S.appInfo.engineVersion }))}</span>` : ''}</span></div>
     <div class="set-row"><span class="k">${esc(t('set.lang'))}</span><select class="input" id="s-lang" style="max-width:260px">${LANGS.map(([c, n]) => `<option value="${c}" ${st.lang === c ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
     <div class="set-row"><span class="k">${esc(t('set.theme'))}</span><div class="seg" id="s-theme">${['system', 'light', 'dark'].map((x) => `<button data-v="${x}" class="${st.theme === x ? 'on' : ''}">${esc(t('set.' + x))}</button>`).join('')}</div></div>
     <div class="set-row"><span class="k">${esc(t('set.outdir'))}</span><div class="output-row"><span class="path grow">${esc(st.outDir || t('set.default'))}</span><button class="btn small" id="s-out">${esc(t('set.choose'))}</button></div></div>
@@ -1792,6 +1794,7 @@ function renderSettings(v) {
     <div class="set-row"><span class="k">${esc(t('set.cache'))}</span><div><button class="btn small" id="s-cache">${esc(t('set.clear'))}</button></div></div>
     <div class="set-row"><span class="k">${esc(t('set.engine'))}</span><span class="path">${esc(S.appInfo?.bin || '')}</span></div>
   </div></div>`;
+  bindClose(v);
   const save = async (patch) => {
     S.settings = await api.settings.set(patch);
     render();
@@ -1840,10 +1843,11 @@ function renderSettings(v) {
 
 function renderHelp(v) {
   const L = S.settings.lang;
-  v.innerHTML = `<div class="prose"><h1 class="page-title">${esc(t('help.title'))}</h1>
+  v.innerHTML = `<div class="prose">${closableTitle(t('help.title'))}
     <div class="row"><button class="btn" id="h-spec">${icon('file')}${esc(t('help.spec'))}</button><button class="btn" id="h-site">${icon('link')}${esc(t('help.site'))}</button></div>
     ${HELP[L] || HELP.en}
     <h3>${esc(t('help.limits'))}</h3><ul>${(LIMITS[L] || LIMITS.en).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
+  bindClose(v);
   $('#h-spec').onclick = () => api.shell.spec();
   $('#h-site').onclick = () => api.shell.site();
 }
@@ -1852,7 +1856,7 @@ function aboutDialog() {
   const i = S.appInfo || {};
   modal({
     title: t('about.title'),
-    body: `<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 32 32" width="56" height="56"><circle cx="16" cy="16" r="14" class="b-disc"/><circle cx="16" cy="16" r="4.2" style="fill:var(--surface)"/><path d="M5 22 Q9 13 13 20 T21 17 T28 12" class="b-wave"/></svg>
+    body: `<div style="display:flex;gap:16px;align-items:center"><img src="brand-icon.png" alt="" width="56" height="56">
       <div><h2>FISO Explorer ${esc(i.version || '')}</h2><p class="hint" style="margin:4px 0 0">${esc(t('about.ref'))}</p></div></div>
       <p class="hint" style="margin-top:16px">© 2026 Anthony Gentil — Retro-Spare · Apache-2.0<br>libFLAC © Xiph.Org Foundation (BSD-3-Clause) · Electron (MIT)<br>${esc(t('about.data'))}</p>`,
     foot: [{ label: t('ok'), primary: true }],
@@ -1926,6 +1930,10 @@ api.on('menu', (a) => {
 
 document.addEventListener('keydown', (e) => {
   if (e.target.matches('input, textarea, select') || $('.modal-back')) return;
+  if (e.key === 'Escape' && (S.view === 'settings' || S.view === 'help')) {
+    go('home');
+    return;
+  }
   if (e.code === 'Space' && S.player.path) {
     e.preventDefault();
     audio.paused ? audio.play() : audio.pause();

@@ -1,12 +1,10 @@
 // FISO Explorer — French. SPDX-License-Identifier: Apache-2.0
 window.I18N.fr = {
   'nav.home': 'Accueil',
-  'nav.create': 'Créer',
-  'nav.open': 'Ouvrir…',
   'nav.settings': 'Paramètres',
   'nav.help': 'Aide',
+  'nav.close': 'Fermer',
   'nav.recent': 'Images ouvertes',
-  'nav.album': 'Album',
 
   'home.title': 'Vos disques, en un seul fichier.',
   'home.lead':
@@ -173,6 +171,7 @@ window.I18N.fr = {
   'ver.verified': 'Vérifié : {m}',
 
   'set.title': 'Paramètres',
+  'set.version': 'Version',
   'set.lang': 'Langue',
   'set.theme': 'Apparence',
   'set.system': 'Système',
@@ -184,6 +183,7 @@ window.I18N.fr = {
   'set.clear': 'Vider le cache',
   'set.cleared': 'Cache vidé.',
   'set.engine': 'Moteur',
+  'set.engine.v': 'moteur {v}',
   'set.default': 'Par défaut',
   'set.choose': 'Choisir…',
 

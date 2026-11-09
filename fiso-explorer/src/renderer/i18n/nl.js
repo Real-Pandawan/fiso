@@ -1,12 +1,10 @@
 // FISO Explorer — Dutch. SPDX-License-Identifier: Apache-2.0
 window.I18N.nl = {
   'nav.home': 'Start',
-  'nav.create': 'Maken',
-  'nav.open': 'Openen…',
   'nav.settings': 'Instellingen',
   'nav.help': 'Help',
+  'nav.close': 'Sluiten',
   'nav.recent': 'Geopende images',
-  'nav.album': 'Album',
   'home.title': "Je cd's, in één bestand.",
   'home.lead':
     'Een FISO-image bewaart een complete audio-cd — verliesvrije FLAC-audio, schijfstructuur, hoesafbeeldingen en metadata — in één open bestand.',
@@ -157,6 +155,7 @@ window.I18N.nl = {
   'ver.segments': 'Segmenten',
   'ver.verified': 'Geverifieerd: {m}',
   'set.title': 'Instellingen',
+  'set.version': 'Versie',
   'set.lang': 'Taal',
   'set.theme': 'Weergave',
   'set.system': 'Systeem',
@@ -168,6 +167,7 @@ window.I18N.nl = {
   'set.clear': 'Cache wissen',
   'set.cleared': 'Cache gewist.',
   'set.engine': 'Engine',
+  'set.engine.v': 'engine {v}',
   'set.default': 'Standaard',
   'set.choose': 'Kiezen…',
   'help.title': 'Help',

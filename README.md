@@ -120,7 +120,7 @@ Installers: `./packaging/macos/build-mac.sh x64|arm64` (on a Mac), `packaging\wi
 
 ## Project status
 
-Version 1.1.1 is the current release. The format, the library and the application are covered by automated tests on macOS, Windows and Linux. CD ripping and the Finder icons have been tested with a simulated drive and are awaiting confirmation on real hardware; please [open an issue](../../issues) if something does not work with your drive.
+Version 1.2.0 is the current release. The format, the library and the application are covered by automated tests on macOS, Windows and Linux. CD ripping and the Finder icons have been tested with a simulated drive and are awaiting confirmation on real hardware; please [open an issue](../../issues) if something does not work with your drive.
 
 ## Contributing
 

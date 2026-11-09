@@ -7,7 +7,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const os = require('node:os');
 const crypto = require('node:crypto');
-const { spawn, execFile } = require('node:child_process');
+const { spawn, execFile, execFileSync } = require('node:child_process');
 
 const APP_VERSION = app.getVersion();
 const USER_AGENT = `FISOExplorer/${APP_VERSION} ( https://github.com/Real-Pandawan/fiso )`;
@@ -843,6 +843,16 @@ function fisoResult(r) {
   return v;
 }
 
+// Version of the bundled fiso tool ("fiso 1.2.0 (libfiso 1.2.0, format 1.0)" → "1.2.0"), or '' when it cannot be run.
+function engineVersion() {
+  try {
+    const out = execFileSync(fisoBin(), ['--version'], { encoding: 'utf8', timeout: 5000 });
+    return (/^fiso\s+(\S+)/.exec(out) || [])[1] || '';
+  } catch {
+    return '';
+  }
+}
+
 function registerIpc() {
   handle('app:info', () => ({
     version: APP_VERSION,
@@ -850,6 +860,7 @@ function registerIpc() {
     arch: process.arch,
     bin: fisoBin(),
     binOk: fs.existsSync(fisoBin()),
+    engineVersion: engineVersion(),
   }));
   handle('settings:get', () => settings);
   handle('settings:set', (_e, s) => {

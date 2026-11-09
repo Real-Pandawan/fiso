@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file. Versions follow [Semantic Versioning](https://semver.org/).
 
+## 1.2.0
+
+* FISO Explorer uses the full window: the left column is gone. A top bar holds the logo (back to the home screen) on the left and Settings and Help on the right.
+* Open images are listed on the home screen.
+* Settings and Help close with a cross (or Escape) and return to the home screen.
+* Settings show the installed version of FISO Explorer and of its engine.
+
 ## 1.1.1
 
 * macOS: the front cover now fills the whole file icon in the Finder on Retina displays (it was drawn at half size in a corner).
