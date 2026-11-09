@@ -50,7 +50,7 @@ Each script builds the engine, runs the tests, then packages the application. Th
 | Windows x64 | Windows | `powershell -ExecutionPolicy Bypass -File packaging\windows\build-windows.ps1` | `.exe` installer |
 | Linux x64 | Linux | `./packaging/linux/build-linux.sh` | `.AppImage` |
 
-On a Mac with Apple Silicon both macOS targets can be built; the tests run only for the native architecture.
+Any Mac can build both macOS targets (the other architecture is cross-compiled); the tests run only for the native architecture. The release workflow builds both on Intel runners.
 
 ### Continuous integration and releases
 

@@ -1,12 +1,18 @@
 # Builds the four installers and attaches them to a GitHub release.
-# Runs when a release is published; can also be started by hand from the Actions tab
-# (the installers are then available as workflow artifacts only).
+# Runs when a release is published. It can also be started by hand from the Actions tab: with a
+# tag (for example v1.2.0) it rebuilds that version and attaches the installers to its existing
+# release; without one the installers are only kept as workflow artifacts.
 name: Release
 
 on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release to attach the installers to (for example v1.2.0); empty to only build
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -22,8 +28,10 @@ jobs:
             os: macos-15-intel
             command: ./packaging/macos/build-mac.sh x64
             files: fiso-explorer/dist/*.dmg
+          # Built on an Intel runner (cross-compiled): GitHub's Apple Silicon runners are often
+          # unavailable for long periods. The tests run in the Intel job and in CI.
           - name: macOS Apple Silicon
-            os: macos-15
+            os: macos-15-intel
             command: ./packaging/macos/build-mac.sh arm64
             files: fiso-explorer/dist/*.dmg
           - name: Windows x64
@@ -37,6 +45,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || github.ref }}
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -51,7 +61,7 @@ jobs:
   publish:
     name: Attach installers to the release
     needs: build
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || inputs.tag != ''
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/download-artifact@v8
@@ -63,4 +73,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           ls -l installers
-          gh release upload "${{ github.event.release.tag_name }}" installers/* --clobber --repo "${{ github.repository }}"
+          gh release upload "${{ github.event.release.tag_name || inputs.tag }}" installers/* --clobber --repo "${{ github.repository }}"
