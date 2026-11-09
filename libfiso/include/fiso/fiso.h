@@ -121,7 +121,7 @@ FISO_API int fiso_extract(const char *path, const char *options_json, fiso_progr
 /* `paths_json`: JSON array of image paths. Returns groups as JSON. */
 FISO_API int fiso_group(const char *paths_json, char **result_json);
 
-/* ---- CD drives (macOS in FISO 1.0; other platforms return FISO_E_UNSUPPORTED) ---- */
+/* ---- CD drives (macOS, Linux and Windows; other platforms return FISO_E_UNSUPPORTED) ---- */
 
 /* Lists optical drives with their capabilities and media state. */
 FISO_API int fiso_cd_drives(char **result_json);
