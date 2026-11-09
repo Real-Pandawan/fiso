@@ -12,6 +12,7 @@ const S = {
   anchor: null,
   verified: {}, // path -> verification report
   create: null,
+  batch: null,
   player: { path: null, rate: 44100, tracks: [], cover: null },
 };
 
@@ -171,9 +172,151 @@ function go(view) {
   render();
 }
 
-// Top bar: the logo goes back to the home screen; settings and help open on the right.
+// ------------------------------------------------------------------ tabs
+// Each tab is an independent session: its own screen, image on screen, selection, image being
+// created or batch. Open images, the player and the settings are shared by all tabs.
+const TAB_FIELDS = ['view', 'current', 'sel', 'anchor', 'create', 'batch'];
+const tabs = [];
+let tabSeq = 0;
+let activeTab = null;
+
+function saveTab() {
+  if (activeTab) for (const k of TAB_FIELDS) activeTab[k] = S[k];
+}
+function loadTab(tab) {
+  activeTab = tab;
+  for (const k of TAB_FIELDS) S[k] = tab[k];
+}
+function openTab(view = 'home') {
+  saveTab();
+  const tab = { id: ++tabSeq, view, current: null, sel: new Set(), anchor: null, create: null, batch: null };
+  tabs.push(tab);
+  loadTab(tab);
+  render();
+}
+function switchTab(id) {
+  if (activeTab?.id === id) return;
+  saveTab();
+  loadTab(tabs.find((x) => x.id === id));
+  render();
+}
+const isActiveJob = (j) => !!j && (j.state === 'queued' || j.state === 'running');
+function tabBusy(tab) {
+  return isActiveJob(tab.create?.job) || !!tab.batch?.running;
+}
+function closeTab(id) {
+  saveTab();
+  const tab = tabs.find((x) => x.id === id);
+  if (!tab) return;
+  const remove = () => {
+    if (isActiveJob(tab.create?.job)) cancelCreate(tab.create);
+    if (tab.batch?.running) cancelBatch(tab.batch);
+    const i = tabs.indexOf(tab);
+    tabs.splice(i, 1);
+    if (!tabs.length) {
+      activeTab = null;
+      openTab('home');
+      return;
+    }
+    if (tab === activeTab) loadTab(tabs[Math.min(i, tabs.length - 1)]);
+    render();
+  };
+  if (!tabBusy(tab)) return remove();
+  modal({
+    title: t('tab.close.title'),
+    body: `<p>${esc(t('tab.close.busy'))}</p>`,
+    foot: [
+      { label: t('cancel') },
+      {
+        label: t('tab.close.confirm'),
+        primary: true,
+        onClick: (c) => {
+          c();
+          remove();
+        },
+      },
+    ],
+  });
+}
+function tabTitle(tab) {
+  switch (tab.view) {
+    case 'explorer':
+      return S.docs.find((d) => d.path === tab.current)?.info.meta.album.title || t('nav.home');
+    case 'create':
+      return tab.create?.form?.album?.title || t('tab.create');
+    case 'batch':
+      return t('ba.title');
+    case 'settings':
+      return t('nav.settings');
+    case 'help':
+      return t('nav.help');
+    default:
+      return t('nav.home');
+  }
+}
+// 0…1 while a creation or a batch runs in the tab, null otherwise.
+function tabProgress(tab) {
+  const j = tab.create?.job;
+  if (isActiveJob(j)) return j.frac || 0;
+  const b = tab.batch;
+  if (b?.running && b.items.length) return batchProgress(b);
+  return null;
+}
+function tabMark(tab) {
+  const j = tab.create?.job;
+  if (j?.state === 'done') return 'ok';
+  if (j?.state === 'error') return 'bad';
+  if (tab.batch?.finished && !tab.batch.seen) return 'ok';
+  return '';
+}
+function renderTabs() {
+  saveTab();
+  const host = $('#tabs');
+  host.innerHTML =
+    tabs
+      .map((tab) => {
+        const p = tabProgress(tab);
+        const mark = tabMark(tab);
+        const title = esc(tabTitle(tab));
+        return `<div class="tab ${tab === activeTab ? 'on' : ''}" data-tab="${tab.id}" role="tab" aria-selected="${tab === activeTab}" title="${title}">
+          ${p != null ? '<span class="tab-spin" aria-hidden="true"></span>' : mark ? `<span class="tab-dot ${mark}"></span>` : ''}
+          <span class="tab-t">${title}</span>
+          <button class="tab-x" data-close="${tab.id}" aria-label="${esc(t('tab.close'))}" title="${esc(t('tab.close'))}">${icon('x')}</button>
+          ${p != null ? `<span class="tab-bar" style="width:${(p * 100).toFixed(1)}%"></span>` : ''}</div>`;
+      })
+      .join('') +
+    `<button class="tab-new" id="tab-new" title="${esc(t('tab.new'))}" aria-label="${esc(t('tab.new'))}">${icon('plus')}</button>`;
+  $$('[data-tab]', host).forEach((el) => {
+    el.onclick = () => switchTab(+el.dataset.tab);
+    el.onauxclick = (e) => {
+      if (e.button === 1) closeTab(+el.dataset.tab);
+    };
+  });
+  $$('[data-close]', host).forEach(
+    (b) =>
+      (b.onclick = (e) => {
+        e.stopPropagation();
+        closeTab(+b.dataset.close);
+      }),
+  );
+  $('#tab-new').onclick = () => openTab('home');
+}
+// Progress events arrive many times a second: redraw the tab strip at most 5 times a second.
+let tabsDrawPending = false;
+function scheduleTabsDraw() {
+  if (tabsDrawPending) return;
+  tabsDrawPending = true;
+  setTimeout(() => {
+    tabsDrawPending = false;
+    renderTabs();
+  }, 200);
+}
+
+// Top bar: the logo goes back to the home screen, the tabs follow it, and settings and help
+// open on the right.
 function renderTopbar() {
   document.body.classList.toggle('mac', isMac());
+  renderTabs();
   const home = $('#tb-home');
   home.title = t('nav.home');
   home.onclick = () => go('home');
@@ -220,7 +363,14 @@ function render() {
   renderTopbar();
   const v = $('#view');
   if (S.view === 'explorer' && !doc()) S.view = 'home';
-  ({ home: renderHome, explorer: renderExplorer, create: renderCreate, settings: renderSettings, help: renderHelp })[S.view](v);
+  ({
+    home: renderHome,
+    explorer: renderExplorer,
+    create: renderCreate,
+    batch: renderBatch,
+    settings: renderSettings,
+    help: renderHelp,
+  })[S.view](v);
   renderTopbar();
 }
 
@@ -233,6 +383,7 @@ function renderHome(v) {
     <div class="hero"><h1>${esc(t('home.title'))}</h1><p>${esc(t('home.lead'))}</p></div>
     <div class="actions">
       ${card('create', 'plus', t('home.create'), t('home.create.d'))}
+      ${card('batch', 'folder', t('ba.title'), t('ba.home.d'))}
       ${card('open', 'folder', t('home.open'), t('home.open.d'))}
       ${card('extract', 'extract', t('home.extract'), t('home.extract.d'))}
       ${card('convert', 'disc', t('cv.title'), t('cv.home.d'))}
@@ -255,6 +406,7 @@ function renderHome(v) {
       (b.onclick = async () => {
         const a = b.dataset.act;
         if (a === 'create') go('create');
+        else if (a === 'batch') go('batch');
         else if (a === 'open') openDialog();
         else if (a === 'extract') {
           const p = await openDialog();
@@ -1173,6 +1325,9 @@ function renderCreate(v) {
         back: null,
       },
     });
+  if (isActiveJob(C.job)) return renderCreateJob(v, C);
+  // finished while the tab was not on screen, or just now: show the result once
+  if (C.job) setTimeout(() => S.create === C && C.job && showCreateResult(C));
   const CD = C.cd;
   v.innerHTML = `<div>
     <h1 class="page-title">${esc(t('cr.title'))}</h1>
@@ -1516,42 +1671,115 @@ async function runAccurateRip(path) {
   return runJob(t('ar.check'), (job) => api.ar.check(path, job));
 }
 
+// Starts the creation (or CD rip) of the form in this tab. It runs in the background: the tab
+// shows its progress, other tabs stay usable, and the main process runs at most 4 at a time.
 async function doCreate(form) {
   const C = S.create;
-  if (!form.valid()) return;
+  if (!form.valid() || isActiveJob(C.job)) return;
   const { meta, pictures } = form.collect();
   delete meta.provenance;
-  let r;
-  let ar = null;
-  if (C.kind === 'cd') {
-    const opts = {
-      device: C.cd.device,
-      output: C.out,
-      overwrite: true,
-      mode: C.cd.mode,
-      read_offset: C.cd.offset,
-      compression: C.compression,
-      meta,
-      pictures,
-      detect_pregaps: true,
-      read_htoa: true,
-    };
-    r = await runJob(t('cd.go'), (job) => api.cd.rip(opts, job));
-    if (!r) return;
-    if (S.settings.accurateRip !== false) ar = await runAccurateRip(r.output);
-  } else {
-    const plan = {
-      output: C.out,
-      overwrite: true,
-      compression: C.compression,
-      flac_passthrough: !C.reencode,
-      meta,
-      pictures,
-      source: C.kind === 'files' ? { kind: 'files', files: C.files.map((f) => f.path) } : { kind: 'cue', path: C.cue.path },
-    };
-    r = await runJob(t('cr.title'), (job) => api.create(plan, job));
-    if (!r) return;
+  const job = (C.job = { id: newJob(), state: 'running', phase: 'wait', frac: 0, result: null, error: '' });
+  createJobs.set(job.id, C);
+  render();
+  try {
+    let r,
+      ar = null;
+    if (C.kind === 'cd') {
+      r = await api.cd.rip(
+        {
+          device: C.cd.device,
+          output: C.out,
+          overwrite: true,
+          mode: C.cd.mode,
+          read_offset: C.cd.offset,
+          compression: C.compression,
+          meta,
+          pictures,
+          detect_pregaps: true,
+          read_htoa: true,
+        },
+        job.id,
+      );
+      if (S.settings.accurateRip !== false) ar = await api.ar.check(r.output, job.id).catch(() => null);
+    } else {
+      r = await api.create(
+        {
+          output: C.out,
+          overwrite: true,
+          compression: C.compression,
+          flac_passthrough: !C.reencode,
+          meta,
+          pictures,
+          source: C.kind === 'files' ? { kind: 'files', files: C.files.map((f) => f.path) } : { kind: 'cue', path: C.cue.path },
+        },
+        job.id,
+      );
+    }
+    job.state = 'done';
+    job.result = { r, ar };
+  } catch (e) {
+    job.state = job.cancelled || /cancel/i.test(e.message) ? 'cancelled' : 'error';
+    job.error = e.message;
+  } finally {
+    createJobs.delete(job.id);
   }
+  // shown now when the tab is on screen, otherwise when the user comes back to it
+  if (S.create === C && S.view === 'create') render();
+  else renderTabs();
+}
+const createJobs = new Map(); // job id -> creation state of a tab
+progressListeners.add((p) => {
+  const C = createJobs.get(p.jobId);
+  if (!C) return;
+  const j = C.job;
+  j.state = p.phase === 'queued' ? 'queued' : 'running';
+  j.phase = p.phase;
+  j.frac = p.total ? p.done / p.total : 0;
+  if (S.create === C && S.view === 'create' && $('#cj-bar')) drawCreateJob(C);
+  scheduleTabsDraw();
+});
+
+function cancelCreate(C) {
+  if (!isActiveJob(C.job)) return;
+  C.job.cancelled = true;
+  api.cancel(C.job.id);
+}
+
+// Progress panel of a creation that runs in this tab.
+function renderCreateJob(v, C) {
+  const a = C.form.album;
+  v.innerHTML = `<div><h1 class="page-title">${esc(t('cr.title'))}</h1>
+    <section class="card job-card">
+      <div class="job-what"><b>${esc(a.title || t('untitled'))}</b>${a.artist ? `<span class="hint"> · ${esc(a.artist)}</span>` : ''}</div>
+      <div class="path">${esc(C.out || '')}</div>
+      <div class="job-phase"><span id="cj-phase"></span><span id="cj-pct" class="num"></span></div>
+      <div class="progress"><div id="cj-bar"></div></div>
+      <p class="hint" style="margin:14px 0 0">${esc(t('tab.bg'))}</p>
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" id="cj-cancel">${esc(t('job.cancel'))}</button></div>
+    </section></div>`;
+  $('#cj-cancel', v).onclick = () => cancelCreate(C);
+  drawCreateJob(C);
+}
+function drawCreateJob(C) {
+  const j = C.job;
+  $('#cj-phase').textContent = j.state === 'queued' ? t('job.queued') : t('job.' + j.phase);
+  $('#cj-pct').textContent = j.state === 'queued' ? '' : pct(j.frac);
+  $('#cj-bar').style.width = `${(j.frac * 100).toFixed(1)}%`;
+}
+
+// Result of a finished creation (report, error or cancellation), shown once.
+function showCreateResult(C) {
+  const job = C.job;
+  C.job = null;
+  if (job.state === 'cancelled') {
+    toast(t('job.cancelled'));
+    return;
+  }
+  if (job.state === 'error') {
+    errorModal(job.error);
+    return;
+  }
+  const { r, ar } = job.result;
   const v = r.verify;
   const allOk = v && v.valid_file.ok && v.intact_audio.ok;
   const rip = r.rip;
@@ -1609,6 +1837,236 @@ async function doCreate(form) {
     ],
   });
   S.create = null;
+  render();
+}
+
+// ------------------------------------------------------------------ batch creation
+// Creates one image per album folder: tags and artwork of the files first, MusicBrainz for what
+// they do not say, "to check" when the match is not certain. Up to 4 images are created at the
+// same time (the main process also caps all creations, in every tab, at 4).
+const BATCH_PARALLEL = 4;
+const BATCH_FINAL = ['ok', 'check', 'exists', 'error', 'cancelled'];
+const batchJobs = new Map(); // job id -> batch item
+
+function newBatch() {
+  return {
+    dirs: [],
+    items: [],
+    scanning: false,
+    out: S.settings.outDir || '',
+    compression: 8,
+    reencode: false,
+    musicbrainz: true,
+    running: false,
+    cancelled: false,
+    finished: false,
+    seen: true,
+  };
+}
+const batchProgress = (b) =>
+  b.items.reduce((n, it) => n + (BATCH_FINAL.includes(it.status) ? 1 : it.frac || 0), 0) / b.items.length;
+
+async function addBatchFolders(B, dirs) {
+  dirs = dirs.filter((d) => !B.dirs.includes(d));
+  if (!dirs.length) return;
+  B.dirs.push(...dirs);
+  B.scanning = true;
+  drawBatch(B);
+  try {
+    const albums = await api.batch.scan(dirs);
+    const known = new Set(B.items.map((it) => it.album.id));
+    for (const a of albums)
+      if (!known.has(a.id)) B.items.push({ album: a, status: 'pending', reasons: [], frac: 0, output: '', error: '' });
+  } catch (e) {
+    errorModal(e.message);
+  } finally {
+    B.scanning = false;
+    drawBatch(B);
+  }
+}
+
+async function runBatch(B) {
+  Object.assign(B, { running: true, cancelled: false, finished: false, seen: S.batch === B });
+  const queue = B.items.filter((it) => it.status === 'pending');
+  const taken = new Set();
+  const options = { compression: B.compression, reencode: B.reencode, musicbrainz: B.musicbrainz };
+  const worker = async () => {
+    while (!B.cancelled && queue.length) await runBatchItem(B, queue.shift(), options, taken);
+  };
+  drawBatch(B);
+  await Promise.all(Array.from({ length: BATCH_PARALLEL }, worker));
+  for (const it of B.items) if (it.status === 'pending') it.status = 'cancelled';
+  Object.assign(B, { running: false, finished: true, seen: S.batch === B && S.view === 'batch' });
+  drawBatch(B);
+  renderTabs();
+}
+
+async function runBatchItem(B, it, options, taken) {
+  it.status = 'preparing';
+  drawBatch(B);
+  let p;
+  try {
+    p = await api.batch.prepare(it.album, B.out, options);
+  } catch (e) {
+    Object.assign(it, { status: 'error', error: humanError(e.message).text });
+    return;
+  }
+  it.album = p.album;
+  it.reasons = p.reasons;
+  // two folders describing the same album must not write the same file
+  const planned = p.plan.output;
+  let out = planned;
+  for (let n = 2; taken.has(out); n++) out = planned.replace(/\.fiso$/i, ` (${n}).fiso`);
+  taken.add(out);
+  p.plan.output = it.output = out;
+  // an image that already exists is never replaced (a renamed one is checked by the engine)
+  if (p.exists && out === planned) {
+    it.status = 'exists';
+    drawBatch(B);
+    return;
+  }
+  if (B.cancelled) return void (it.status = 'cancelled');
+  it.jobId = newJob();
+  it.status = 'running';
+  batchJobs.set(it.jobId, { B, it });
+  try {
+    const r = await api.create(p.plan, it.jobId);
+    const ok = r.verify?.valid_file?.ok && r.verify?.intact_audio?.ok;
+    it.status = !ok ? 'error' : it.reasons.length ? 'check' : 'ok';
+    if (!ok) it.error = t('ba.verify.failed');
+  } catch (e) {
+    if (B.cancelled || /cancel/i.test(e.message)) it.status = 'cancelled';
+    else {
+      it.status = /\[exists\]|already exists/i.test(e.message) ? 'exists' : 'error';
+      it.error = humanError(e.message).text;
+    }
+  } finally {
+    batchJobs.delete(it.jobId);
+    it.frac = 0;
+    drawBatch(B);
+  }
+}
+progressListeners.add((p) => {
+  const x = batchJobs.get(p.jobId);
+  if (!x) return;
+  x.it.status = p.phase === 'queued' ? 'queued' : 'running';
+  x.it.frac = p.total ? p.done / p.total : 0;
+  drawBatch(x.B);
+});
+
+function cancelBatch(B) {
+  B.cancelled = true;
+  for (const [id, x] of batchJobs) if (x.B === B) api.cancel(id);
+  drawBatch(B);
+}
+
+// Redraws the batch screen at most 4 times a second (progress events are frequent).
+let batchDrawPending = false;
+function drawBatch(B) {
+  scheduleTabsDraw();
+  if (S.batch !== B || S.view !== 'batch' || batchDrawPending) return;
+  batchDrawPending = true;
+  setTimeout(() => {
+    batchDrawPending = false;
+    if (S.batch === B && S.view === 'batch') renderBatch($('#view'));
+  }, 250);
+}
+
+function renderBatch(v) {
+  const B = S.batch || (S.batch = newBatch());
+  if (B.finished && S.view === 'batch') B.seen = true;
+  const count = (st) => B.items.filter((it) => (Array.isArray(st) ? st.includes(it.status) : it.status === st)).length;
+  const locked = B.running || B.scanning;
+  const pending = count('pending');
+  const statusText = (it) =>
+    it.status === 'running' ? pct(it.frac) : it.status === 'check' ? t('ba.s.check') : t('ba.s.' + it.status);
+  const statusIcon = { ok: 'check', check: 'alert', error: 'alert', exists: 'info', cancelled: 'x' };
+  const rows = B.items
+    .map((it, i) => {
+      const a = it.album;
+      const name = [a.album.artist, a.album.title].filter(Boolean).join(' – ');
+      const disc = a.disc.total > 1 ? ` · ${t('ex.disc', { n: a.disc.number, t: a.disc.total })}` : '';
+      return `<tr class="ba-${it.status}">
+        <td class="num hint">${i + 1}</td>
+        <td><b>${esc(name)}</b><span class="hint">${esc(disc)} · ${esc(t('ba.tracks', { n: a.tracks.length }))}${a.front ? '' : ' · ' + esc(t('ba.nocover'))}</span>
+          ${it.reasons.length ? `<div class="ba-why">${it.reasons.map((r) => esc(t('ba.r.' + r))).join(' · ')}</div>` : ''}
+          ${it.error ? `<div class="error-text">${esc(it.error)}</div>` : ''}
+          <div class="path">${esc(it.output || a.dir)}</div></td>
+        <td class="ba-status">${statusIcon[it.status] ? icon(statusIcon[it.status]) : ''}<span>${esc(statusText(it))}</span>
+          ${it.status === 'running' ? `<div class="progress small"><div style="width:${(it.frac * 100).toFixed(1)}%"></div></div>` : ''}</td>
+        <td>${['ok', 'check'].includes(it.status) ? `<button class="btn small" data-open="${i}">${esc(t('ba.open'))}</button>` : !locked && it.status === 'pending' ? `<button class="btn ghost icon-btn" data-remove="${i}" title="${esc(t('ba.remove'))}" aria-label="${esc(t('ba.remove'))}">${icon('x')}</button>` : ''}</td></tr>`;
+    })
+    .join('');
+  const summary = B.finished
+    ? `<div class="integrity" style="margin:0 0 14px">
+        <span class="badge ok">${icon('check')}${esc(t('ba.sum.ok', { n: count(['ok', 'check']) }))}</span>
+        ${count('check') ? `<span class="badge warn">${icon('alert')}${esc(t('ba.sum.check', { n: count('check') }))}</span>` : ''}
+        ${count('exists') ? `<span class="badge">${esc(t('ba.sum.exists', { n: count('exists') }))}</span>` : ''}
+        ${count('error') ? `<span class="badge bad">${icon('alert')}${esc(t('ba.sum.error', { n: count('error') }))}</span>` : ''}
+        ${count('cancelled') ? `<span class="badge">${esc(t('ba.sum.cancelled', { n: count('cancelled') }))}</span>` : ''}</div>`
+    : B.running
+      ? `<div class="job-phase"><span>${esc(t('ba.progress', { d: count(BATCH_FINAL), n: B.items.length, r: count(['running', 'preparing']) }))}</span><span class="num">${pct(batchProgress(B))}</span></div><div class="progress" style="margin-bottom:14px"><div style="width:${(batchProgress(B) * 100).toFixed(1)}%"></div></div>`
+      : '';
+  v.innerHTML = `<div>
+    <h1 class="page-title">${esc(t('ba.title'))}</h1>
+    <p class="lead">${esc(t('ba.lead'))}</p>
+    <section class="card step"><div class="step-h"><span class="step-n">1</span><h2>${esc(t('ba.folders'))}</h2></div>
+      <div class="row" style="gap:10px;flex-wrap:wrap">
+        <button class="btn" id="ba-add" ${locked ? 'disabled' : ''}>${icon('folder')}${esc(t('ba.add'))}</button>
+        <span class="hint grow">${esc(B.scanning ? t('ba.scanning') : B.items.length ? t('ba.found', { n: B.items.length, f: B.dirs.length }) : t('ba.add.d'))}</span>
+        ${B.items.length && !locked ? `<button class="btn ghost" id="ba-clear">${esc(t('ba.clear'))}</button>` : ''}
+      </div>
+    </section>
+    <section class="card step"><div class="step-h"><span class="step-n">2</span><h2>${esc(t('ba.options'))}</h2></div>
+      <label class="check"><input type="checkbox" id="ba-mb" ${B.musicbrainz ? 'checked' : ''} ${locked ? 'disabled' : ''}><span>${esc(t('ba.mb'))}<br><span class="hint">${esc(t('ba.mb.d'))}</span></span></label>
+      <label class="check" style="margin-top:10px"><input type="checkbox" id="ba-reenc" ${B.reencode ? 'checked' : ''} ${locked ? 'disabled' : ''}><span>${esc(t('cr.reencode'))}<br><span class="hint">${esc(t('cr.reencode.d'))}</span></span></label>
+      <div class="row" style="align-items:flex-end;gap:18px;flex-wrap:wrap;margin-top:14px">
+        <label class="field">${esc(t('cr.compression'))}<select class="input" id="ba-level" style="width:120px" ${locked ? 'disabled' : ''}>${[8, 7, 6, 5, 4, 3, 2, 1, 0].map((n) => `<option ${B.compression === n ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+        <span class="hint grow">${esc(t('ba.names'))}</span>
+      </div>
+      <div class="output-row" style="margin-top:16px"><span class="path grow">${esc(B.out || t('ba.noout'))}</span><button class="btn" id="ba-out" ${locked ? 'disabled' : ''}>${esc(t('cr.choose'))}</button></div>
+    </section>
+    <section class="card step"><div class="step-h"><span class="step-n">3</span><h2>${esc(t('ba.albums'))}</h2></div>
+      ${summary}
+      ${B.items.length ? `<div class="ba-table-wrap"><table class="ba-table"><tbody>${rows}</tbody></table></div>` : `<p class="hint">${esc(t('ba.empty'))}</p>`}
+      <div class="row" style="justify-content:flex-end;gap:10px;margin-top:16px">
+        ${B.running ? `<button class="btn" id="ba-cancel" ${B.cancelled ? 'disabled' : ''}>${esc(t('ba.cancel'))}</button>` : ''}
+        ${!B.running ? `<button class="btn primary" id="ba-go" ${!pending || !B.out || B.scanning ? 'disabled' : ''}>${icon('disc')}${esc(t('ba.go', { n: pending }))}</button>` : ''}
+      </div>
+    </section></div>`;
+  const on = (id, ev, fn) => $(id, v) && ($(id, v)[ev] = fn);
+  on('#ba-add', 'onclick', async () => addBatchFolders(B, await api.batch.chooseFolders()));
+  on('#ba-clear', 'onclick', () => {
+    Object.assign(B, { dirs: [], items: [], finished: false });
+    renderBatch(v);
+  });
+  on('#ba-mb', 'onchange', (e) => (B.musicbrainz = e.target.checked));
+  on('#ba-reenc', 'onchange', (e) => (B.reencode = e.target.checked));
+  on('#ba-level', 'onchange', (e) => (B.compression = +e.target.value));
+  on('#ba-out', 'onclick', async () => {
+    const d = await api.dialogs.chooseDir(B.out);
+    if (d) {
+      B.out = d;
+      renderBatch(v);
+    }
+  });
+  on('#ba-go', 'onclick', () => runBatch(B));
+  on('#ba-cancel', 'onclick', () => cancelBatch(B));
+  $$('[data-remove]', v).forEach(
+    (b) =>
+      (b.onclick = () => {
+        B.items.splice(+b.dataset.remove, 1);
+        renderBatch(v);
+      }),
+  );
+  $$('[data-open]', v).forEach(
+    (b) =>
+      (b.onclick = async () => {
+        const p = B.items[+b.dataset.open].output;
+        openTab('home');
+        await openImage(p);
+      }),
+  );
 }
 
 // ------------------------------------------------------------------ audio CD export
@@ -1884,6 +2342,10 @@ window.addEventListener('drop', async (e) => {
   const paths = [...e.dataTransfer.files].map((f) => api.pathOf(f)).filter(Boolean);
   const fisos = paths.filter((p) => /\.fiso$/i.test(p));
   const audioFiles = paths.filter((p) => /\.(flac|wav)$/i.test(p));
+  if (S.view === 'batch' && S.batch && !S.batch.running && !fisos.length && paths.length) {
+    addBatchFolders(S.batch, paths);
+    return;
+  }
   if (fisos.length) {
     for (const p of fisos) await openImage(p, true);
     S.current = fisos[fisos.length - 1];
@@ -1910,6 +2372,9 @@ api.on('menu', (a) => {
   ({
     open: openDialog,
     create: () => go('create'),
+    batch: () => go('batch'),
+    newtab: () => openTab('home'),
+    closetab: () => closeTab(activeTab.id),
     close: closeCurrent,
     extract: extractDialog,
     verify: verifyCurrent,
@@ -1944,5 +2409,5 @@ document.addEventListener('keydown', (e) => {
 (async () => {
   S.settings = await api.settings.get();
   S.appInfo = await api.appInfo();
-  render();
+  openTab('home');
 })();

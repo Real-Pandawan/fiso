@@ -47,6 +47,8 @@ On Ubuntu 22.04 and later, AppImages need FUSE 2: `sudo apt install libfuse2` (U
 | Feature | macOS | Windows | Linux |
 |---|:-:|:-:|:-:|
 | Create images from FLAC/WAV files or BIN/CUE (FLAC files are stored without re-encoding when possible, or re-encoded on request with the same settings for every track) | ✓ | ✓ | ✓ |
+| Batch creation: add folders of albums, images are created automatically from the tags and artwork of the files, completed with MusicBrainz | ✓ | ✓ | ✓ |
+| Tabs: several creations and images side by side, up to 4 creations at the same time | ✓ | ✓ | ✓ |
 | Rip audio CDs: secure mode, C2 error pointers, read offset, pre-gaps, hidden track, ISRC, MCN, CD-Text | ✓ | ✓ | ✓ |
 | AccurateRip verification | ✓ | ✓ | ✓ |
 | MusicBrainz metadata and Cover Art Archive artwork | ✓ | ✓ | ✓ |

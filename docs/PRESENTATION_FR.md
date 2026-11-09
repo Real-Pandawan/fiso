@@ -33,6 +33,8 @@ Pour compiler soi-même le logiciel, voir [BUILDING.md](BUILDING.md).
 ## Ce que fait la version 1.2.0
 
 * Créer une image depuis un **CD audio** (mode sécurisé ou rapide, pointeurs C2, correction du décalage de lecture, détection des pré-gaps, audio caché avant la piste 1, ISRC, MCN, CD-Text), depuis des fichiers FLAC/WAV ou depuis un fichier CUE. Les fichiers FLAC sont conservés tels quels, ou réencodés à la demande avec exactement les mêmes réglages pour toutes les pistes.
+* **Créer en lot** : ajouter des dossiers d'albums (à n'importe quelle profondeur) ; FISO Explorer crée une image par album à partir des tags et de la pochette des fichiers, complétés par MusicBrainz (artiste, album et nombre de pistes). Si la correspondance n'est pas certaine, l'image est créée à partir des tags et marquée « à vérifier ». 4 images au plus sont créées en même temps.
+* Travailler avec des **onglets** : plusieurs créations et images côte à côte ; une création continue dans son onglet pendant qu'on travaille dans un autre.
 * Identifier le disque avec MusicBrainz (vignette de la pochette et nombre de pistes pour chaque édition) et récupérer les pochettes sur Cover Art Archive.
 * Vérifier l'extraction avec **AccurateRip** ; l'état « Rip vérifié » n'est enregistré que si toutes les pistes correspondent.
 * Ouvrir, explorer, écouter (lecture sans blanc entre les pistes), vérifier, modifier les métadonnées.

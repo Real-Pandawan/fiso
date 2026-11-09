@@ -8,6 +8,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const crypto = require('node:crypto');
 const { spawn, execFile, execFileSync } = require('node:child_process');
+const library = require('./library');
 
 const APP_VERSION = app.getVersion();
 const USER_AGENT = `FISOExplorer/${APP_VERSION} ( https://github.com/Real-Pandawan/fiso )`;
@@ -68,6 +69,34 @@ const tmpRoot = () => {
 
 // ------------------------------------------------------------------ running the fiso tool
 const jobs = new Map(); // jobId -> child process
+
+// At most MAX_CREATIONS images are created (or CDs ripped) at the same time, whatever the number
+// of tabs or the size of a batch: each one keeps a processor core busy with FLAC encoding.
+// The others wait in order; a waiting job can be cancelled.
+const MAX_CREATIONS = 4;
+let creationsRunning = 0;
+const creationQueue = []; // { jobId, resolve, reject }
+async function withCreationSlot(jobId, report, fn) {
+  if (creationsRunning < MAX_CREATIONS) creationsRunning++;
+  else {
+    report({ phase: 'queued', done: 0, total: 0 });
+    // the job that finishes hands its slot over (creationsRunning stays the same)
+    await new Promise((resolve, reject) => creationQueue.push({ jobId, resolve, reject }));
+  }
+  try {
+    return await fn();
+  } finally {
+    const next = creationQueue.shift();
+    if (next) next.resolve();
+    else creationsRunning--;
+  }
+}
+function cancelQueuedCreation(jobId) {
+  const i = creationQueue.findIndex((q) => q.jobId === jobId);
+  if (i < 0) return false;
+  creationQueue.splice(i, 1)[0].reject(new Error('cancelled'));
+  return true;
+}
 
 function runFiso(args, { jobId, onProgress } = {}) {
   return new Promise((resolve) => {
@@ -349,6 +378,15 @@ async function mbRelease(id) {
   };
 }
 
+async function mbSearch(artist, album) {
+  const q = [album && `release:"${album.replace(/"/g, '')}"`, artist && `artist:"${artist.replace(/"/g, '')}"`]
+    .filter(Boolean)
+    .join(' AND ');
+  if (!q) return [];
+  const j = await mbFetch(`${MB}/release/?query=${encodeURIComponent(q)}&limit=20&fmt=json`);
+  return (j?.releases || []).map(summarizeRelease);
+}
+
 async function caaDownload(mbid, kind) {
   const list = await mbFetch(`https://coverartarchive.org/release/${encodeURIComponent(mbid)}`).catch(() => null);
   if (!list || !list.images) return null;
@@ -504,6 +542,9 @@ const MENU_TEXT = {
     open: 'Ouvrir une image…',
     create: 'Créer une image…',
     close: 'Fermer',
+    newTab: 'Nouvel onglet',
+    batch: 'Créer en lot…',
+    closeTab: 'Fermer l’onglet',
     tools: 'Outils',
     extract: 'Extraire…',
     tocd: 'Convertir en image CD audio gravable…',
@@ -527,6 +568,9 @@ const MENU_TEXT = {
     open: 'Open Image…',
     create: 'Create Image…',
     close: 'Close',
+    newTab: 'New Tab',
+    batch: 'Batch Creation…',
+    closeTab: 'Close Tab',
     tools: 'Tools',
     extract: 'Extract…',
     tocd: 'Convert to a Burnable Audio CD Image…',
@@ -550,6 +594,9 @@ const MENU_TEXT = {
     open: 'Abrir imagen…',
     create: 'Crear imagen…',
     close: 'Cerrar',
+    newTab: 'Nueva pestaña',
+    batch: 'Creación por lotes…',
+    closeTab: 'Cerrar pestaña',
     tools: 'Herramientas',
     extract: 'Extraer…',
     tocd: 'Convertir en imagen de CD de audio grabable…',
@@ -573,6 +620,9 @@ const MENU_TEXT = {
     open: 'Image öffnen…',
     create: 'Image erstellen…',
     close: 'Schließen',
+    newTab: 'Neuer Tab',
+    batch: 'Stapelerstellung…',
+    closeTab: 'Tab schließen',
     tools: 'Werkzeuge',
     extract: 'Exportieren…',
     tocd: 'In brennbares Audio-CD-Image umwandeln…',
@@ -596,6 +646,9 @@ const MENU_TEXT = {
     open: 'Abrir imagem…',
     create: 'Criar imagem…',
     close: 'Fechar',
+    newTab: 'Novo separador',
+    batch: 'Criação em lote…',
+    closeTab: 'Fechar separador',
     tools: 'Ferramentas',
     extract: 'Extrair…',
     tocd: 'Converter em imagem de CD de áudio gravável…',
@@ -619,6 +672,9 @@ const MENU_TEXT = {
     open: 'Apri immagine…',
     create: 'Crea immagine…',
     close: 'Chiudi',
+    newTab: 'Nuova scheda',
+    batch: 'Creazione in blocco…',
+    closeTab: 'Chiudi scheda',
     tools: 'Strumenti',
     extract: 'Estrai…',
     tocd: 'Converti in immagine CD audio masterizzabile…',
@@ -642,6 +698,9 @@ const MENU_TEXT = {
     open: 'Image openen…',
     create: 'Image maken…',
     close: 'Sluiten',
+    newTab: 'Nieuw tabblad',
+    batch: 'Batch aanmaken…',
+    closeTab: 'Tabblad sluiten',
     tools: 'Gereedschap',
     extract: 'Exporteren…',
     tocd: 'Omzetten naar brandbare audio-cd-image…',
@@ -665,6 +724,9 @@ const MENU_TEXT = {
     open: 'イメージを開く…',
     create: 'イメージを作成…',
     close: '閉じる',
+    newTab: '新しいタブ',
+    batch: '一括作成…',
+    closeTab: 'タブを閉じる',
     tools: 'ツール',
     extract: '書き出し…',
     tocd: '書き込み可能なオーディオ CD イメージに変換…',
@@ -716,10 +778,13 @@ function buildMenu() {
     {
       label: t.file,
       submenu: [
+        { label: t.newTab, accelerator: 'CmdOrCtrl+T', click: () => send('newtab') },
         { label: t.open, accelerator: 'CmdOrCtrl+O', click: () => send('open') },
         { label: t.create, accelerator: 'CmdOrCtrl+N', click: () => send('create') },
+        { label: t.batch, accelerator: 'CmdOrCtrl+Shift+N', click: () => send('batch') },
         { type: 'separator' },
         { label: t.close, accelerator: 'CmdOrCtrl+W', click: () => send('close') },
+        { label: t.closeTab, accelerator: 'CmdOrCtrl+Shift+W', click: () => send('closetab') },
         ...(isMac ? [] : [{ type: 'separator' }, { role: 'quit' }]),
       ],
     },
@@ -959,20 +1024,22 @@ function registerIpc() {
     if (opts.allowConversion) args.push('--convert');
     return fisoResult(await runFiso(args, { jobId, onProgress: progressSender(e, jobId) }));
   });
-  handle('fiso:create', async (e, plan, jobId) => {
-    const planFile = path.join(tmpRoot(), `plan-${jobId}.json`);
-    fs.writeFileSync(planFile, JSON.stringify(plan));
-    try {
-      return fisoResult(
-        await runFiso(['create', '--plan', planFile, '--json', '--progress-json'], {
-          jobId,
-          onProgress: progressSender(e, jobId),
-        }),
-      );
-    } finally {
-      fs.rmSync(planFile, { force: true });
-    }
-  });
+  handle('fiso:create', (e, plan, jobId) =>
+    withCreationSlot(jobId, progressSender(e, jobId), async () => {
+      const planFile = path.join(tmpRoot(), `plan-${jobId}.json`);
+      fs.writeFileSync(planFile, JSON.stringify(plan));
+      try {
+        return fisoResult(
+          await runFiso(['create', '--plan', planFile, '--json', '--progress-json'], {
+            jobId,
+            onProgress: progressSender(e, jobId),
+          }),
+        );
+      } finally {
+        fs.rmSync(planFile, { force: true });
+      }
+    }),
+  );
   handle('fiso:edit', async (e, file, edit, jobId) => {
     const editFile = path.join(tmpRoot(), `edit-${jobId}.json`);
     fs.writeFileSync(editFile, JSON.stringify(edit));
@@ -999,6 +1066,7 @@ function registerIpc() {
     return (v.groups || []).find((g) => g.discs.some((d) => d.path === file)) || null;
   });
   handle('job:cancel', (_e, jobId) => {
+    if (cancelQueuedCreation(jobId)) return true;
     const c = jobs.get(jobId);
     if (c) c.kill('SIGTERM');
     return !!c;
@@ -1023,19 +1091,59 @@ function registerIpc() {
     fisoResult(await runFiso(['eject', '--device', device || '']));
     return true;
   });
-  handle('cd:rip', async (e, options, jobId) => {
-    const f = path.join(tmpRoot(), `rip-${jobId}.json`);
-    fs.writeFileSync(f, JSON.stringify(options));
-    try {
-      return fisoResult(
-        await runFiso(['rip', options.output, '--options', f, '--json', '--progress-json'], {
-          jobId,
-          onProgress: progressSender(e, jobId),
-        }),
-      );
-    } finally {
-      fs.rmSync(f, { force: true });
+  handle('cd:rip', (e, options, jobId) =>
+    withCreationSlot(jobId, progressSender(e, jobId), async () => {
+      const f = path.join(tmpRoot(), `rip-${jobId}.json`);
+      fs.writeFileSync(f, JSON.stringify(options));
+      try {
+        return fisoResult(
+          await runFiso(['rip', options.output, '--options', f, '--json', '--progress-json'], {
+            jobId,
+            onProgress: progressSender(e, jobId),
+          }),
+        );
+      } finally {
+        fs.rmSync(f, { force: true });
+      }
+    }),
+  );
+
+  // Batch creation: album folders → album descriptions → create plans.
+  handle('batch:chooseFolders', async () => {
+    const r = await dialog.showOpenDialog(win, {
+      properties: ['openDirectory', 'multiSelections'],
+      defaultPath: app.getPath('music'),
+    });
+    return r.canceled ? [] : r.filePaths;
+  });
+  handle('batch:scan', async (_e, dirs) => {
+    const coverDir = path.join(tmpRoot(), 'batch-covers');
+    const albums = [];
+    for (const f of library.findAlbumFolders(dirs)) {
+      albums.push(...library.describeFolder(f, coverDir));
+      await new Promise((r) => setImmediate(r)); // keep the main process responsive on large libraries
     }
+    return albums;
+  });
+  handle('batch:prepare', async (_e, album, outDir, options) => {
+    let reasons = [];
+    if (!album.tagged) reasons.push('no_tags');
+    if (album.mixed) reasons.push('mixed');
+    if (options.musicbrainz) {
+      try {
+        const r = await library.completeWithMusicBrainz(album, {
+          search: mbSearch,
+          release: mbRelease,
+          cover: caaDownload,
+        });
+        reasons = reasons.concat(r.reasons);
+      } catch (e) {
+        reasons.push('mb_error');
+      }
+    }
+    fs.mkdirSync(outDir, { recursive: true });
+    const plan = library.createPlan(album, outDir, options);
+    return { album, reasons, plan, exists: fs.existsSync(plan.output) };
   });
   handle('ar:offset', (_e, vendor, product) => arOffsetFor(vendor, product));
   handle('ar:check', async (e, file, jobId) => {
@@ -1068,14 +1176,7 @@ function registerIpc() {
     );
     return (j?.releases || []).map(summarizeRelease);
   });
-  handle('mb:search', async (_e, artist, album) => {
-    const q = [album && `release:"${album.replace(/"/g, '')}"`, artist && `artist:"${artist.replace(/"/g, '')}"`]
-      .filter(Boolean)
-      .join(' AND ');
-    if (!q) return [];
-    const j = await mbFetch(`${MB}/release/?query=${encodeURIComponent(q)}&limit=20&fmt=json`);
-    return (j?.releases || []).map(summarizeRelease);
-  });
+  handle('mb:search', (_e, artist, album) => mbSearch(artist, album));
   handle('mb:release', (_e, id) => mbRelease(id));
   handle('caa:download', (_e, mbid, kind) => caaDownload(mbid, kind));
 

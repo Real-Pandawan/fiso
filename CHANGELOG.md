@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. Versions follow
 
 ## 1.2.0
 
+* Tabs: each tab is an independent session (home, image, creation, batch). A creation keeps running in its tab while you work in others; the tab shows its progress and a mark when it is done.
+* At most 4 images are created (or CDs ripped) at the same time, across all tabs; the others wait for a free slot and can be cancelled while waiting.
+* Batch creation: add one or more folders of albums and FISO Explorer finds every album inside, at any depth. Tags and artwork of the files (embedded picture or cover.jpg, folder.jpg…) come first; MusicBrainz completes what they do not say, matching artist, album and number of tracks. When the match is not certain, the image is created from the tags and marked "to check". Images are named "Artist - Album.fiso" in the chosen folder and existing images are never replaced.
+* New menu items: New Tab (Ctrl/Cmd+T), Batch Creation (Ctrl/Cmd+Shift+N), Close Tab (Ctrl/Cmd+Shift+W).
+
 * FISO Explorer uses the full window: the left column is gone. A top bar holds the logo (back to the home screen) on the left and Settings and Help on the right.
 * Open images are listed on the home screen.
 * Settings and Help close with a cross (or Escape) and return to the home screen.

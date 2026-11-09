@@ -33,6 +33,7 @@ Before sending a pull request:
 | `libfiso/src/` | Format implementation: `layout` (disc structure), `image` (reading), `writer` / `create` (writing), `ops` (verify, edit, extract), `cd_*` (CD drives and AccurateRip), `capi.cpp` (C API) |
 | `fiso-cli/main.cpp` | The `fiso` tool; uses only the public API |
 | `fiso-explorer/src/main.js` | Electron main process: windows, menus, files, runs `fiso` |
+| `fiso-explorer/src/library.js` | Batch creation: finds album folders, reads FLAC tags and artwork, completes them with MusicBrainz |
 | `fiso-explorer/src/renderer/` | User interface (plain JavaScript, no framework) |
 | `fiso-explorer/native/thumbnail/` | macOS Quick Look extension (Finder icons) |
 | `packaging/` | Installer scripts |

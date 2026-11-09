@@ -30,6 +30,11 @@ contextBridge.exposeInMainWorld('fiso', {
   edit: (p, e, job) => call('fiso:edit', p, e, job),
   album: (p) => call('fiso:album', p),
   cancel: (job) => call('job:cancel', job),
+  batch: {
+    chooseFolders: () => call('batch:chooseFolders'),
+    scan: (dirs) => call('batch:scan', dirs),
+    prepare: (album, outDir, options) => call('batch:prepare', album, outDir, options),
+  },
   peekCue: (p) => call('source:peekCue', p),
   peekFiles: (ps) => call('source:peekFiles', ps),
   player: (p) => call('player:open', p),
