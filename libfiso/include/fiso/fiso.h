@@ -31,7 +31,7 @@ extern "C" {
 
 #define FISO_FORMAT_VERSION_MAJOR 1
 #define FISO_FORMAT_VERSION_MINOR 0
-#define FISO_LIB_VERSION "1.1.0"
+#define FISO_LIB_VERSION "1.1.1"
 
 /* Error / status codes. Also used as process exit codes by the `fiso` tool. */
 typedef enum fiso_status {

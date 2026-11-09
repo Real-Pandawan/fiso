@@ -50,6 +50,7 @@ static size_t (*CGImageGetWidth_)(CGImageRef);
 static size_t (*CGImageGetHeight_)(CGImageRef);
 static void (*CGContextDrawImage_)(CGContextRef, CGRect, CGImageRef);
 static void (*CGContextSetInterpolationQuality_)(CGContextRef, int);
+static CGRect (*CGContextGetClipBoundingBox_)(CGContextRef);
 static void *g_globalBlockIsa;
 
 template <class R, class... A>
@@ -87,7 +88,15 @@ enum { BLOCK_IS_GLOBAL = 1 << 28, BLOCK_HAS_SIGNATURE = 1 << 30 };
 static signed char drawCover(DrawBlock *b, CGContextRef ctx) {
     if (!ctx || !b->image) return 0;
     if (CGContextSetInterpolationQuality_) CGContextSetInterpolationQuality_(ctx, 3 /* kCGInterpolationHigh */);
-    CGContextDrawImage_(ctx, CGRect{{0, 0}, b->size}, b->image);
+    // On Retina screens Quick Look hands over a context measured in pixels (size × scale) without
+    // scaling it, so the requested size in points would fill only part of it. Fill whatever the
+    // context actually covers; its aspect ratio is the cover's, as requested in provide().
+    CGRect area{{0, 0}, b->size};
+    if (CGContextGetClipBoundingBox_) {
+        CGRect clip = CGContextGetClipBoundingBox_(ctx);
+        if (clip.size.width > 0 && clip.size.height > 0) area = clip;
+    }
+    CGContextDrawImage_(ctx, area, b->image);
     return 1;
 }
 
@@ -169,6 +178,7 @@ int main(int argc, char **argv) {
     CGContextDrawImage_ = (decltype(CGContextDrawImage_))dlsym(cg, "CGContextDrawImage");
     CGContextSetInterpolationQuality_ =
         (decltype(CGContextSetInterpolationQuality_))dlsym(cg, "CGContextSetInterpolationQuality");
+    CGContextGetClipBoundingBox_ = (decltype(CGContextGetClipBoundingBox_))dlsym(cg, "CGContextGetClipBoundingBox");
     g_globalBlockIsa = dlsym(RTLD_DEFAULT, "_NSConcreteGlobalBlock");
     auto allocPair = (Class(*)(Class, const char *, size_t))dlsym(objc, "objc_allocateClassPair");
     auto registerPair = (void (*)(Class))dlsym(objc, "objc_registerClassPair");
